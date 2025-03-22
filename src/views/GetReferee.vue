@@ -7,17 +7,17 @@
 
     <h2>裁判简介</h2>
 
-    <refereeTable></refereeTable>
+    <refereeUL></refereeUL>
   </div>
 
 </template>
 
 <script>
-import refereeTable from "../components/refereeTable"
+import refereeUL from "../components/refereeUL"
 export default {
   name: "GetReferee",
   components: {
-    refereeTable: refereeTable
+    refereeUL: refereeUL
   }
 }
 </script>

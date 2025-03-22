@@ -12,14 +12,17 @@
 </template>
 
 <script>
-import auditStatBoard from "../components/auditStatBoard"
 import auditTable from "../components/auditTable"
 export default {
   name: "AuditEvent",
   components: {
-    auditStatBoard: auditStatBoard,
     auditTable: auditTable
+  },
+  methods: {
+  handleClick(tab, event) {
+    console.log(tab, event);
   }
+}
 }
 </script>
 

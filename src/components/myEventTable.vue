@@ -1,15 +1,19 @@
 <template>
-  <div>
+  <div class="container">
+    <el-tabs v-model="review_status" @tab-click="handleClick">
+      <el-tab-pane label="待审核" name="0"></el-tab-pane>
+      <el-tab-pane label="已通过" name="1"></el-tab-pane>
+      <el-tab-pane label="已否决" name="2"></el-tab-pane>
+      <el-tab-pane label="已撤销" name="3"></el-tab-pane>
+    </el-tabs>
+
     <el-table
-        :data="eventTableData.filter(data => {
-        const matchesSearch = !this.search || data.sport.toLowerCase().includes(this.search.toLowerCase());
-        const matchesState = data.state === this.tableState;
-        return matchesSearch && matchesState;
-      })"
+        :data="$store.state.myEventTableData"
         style="width: 100%"
-        empty-text = "暂无数据"
-        height="72vh"
-        v-loading = "loading">
+        empty-text="暂无数据"
+        v-loading="loading"
+        class="dynamic-height-table"
+        height="69vh">
       <el-table-column
           label="比赛时间">
             <template slot-scope="scope">
@@ -18,19 +22,19 @@
       </el-table-column>
       <el-table-column
           label="比赛项目"
-          prop="sport">
+          prop="event_sport">
       </el-table-column>
       <el-table-column
           label="参赛双方"
-          prop="players">
+          prop="participants">
       </el-table-column>
       <el-table-column
           label="比赛场地"
-          prop="venue">
+          prop="venue_name">
       </el-table-column>
       <el-table-column
           label="负责人"
-          prop="responsiblePerson">
+          prop="responsible_person">
       </el-table-column>
       <el-table-column
           label="备注"
@@ -51,106 +55,121 @@
       </el-table-column>
 
       <el-table-column
-          align="right">
+          align="right"
+          fixed="right">
         <template slot="header" slot-scope="scope">
           <el-input
               v-model="search"
               size="mini"
-              placeholder="输入关键字搜索"/>
+              placeholder="输入关键字搜索"
+              @change="getMyEvent"/>
         </template>
-        <template slot-scope="scope" v-if="scope.row.state !== '已否决'">
-          <el-button v-if="scope.row.state === '待付款'"
-              size="mini"
-              @click="handleEdit(scope.$index, scope.row)"
-              type="primary">付款</el-button>
+        <template slot-scope="scope" v-if="review_status === '0' || review_status === '1'">
           <el-button
               size="mini"
-              @click="handleEdit(scope.$index, scope.row)"
-              type="danger">撤销</el-button>
+              type="danger" v-if="chooseTag(scope.row.start_time, scope.row.end_time)[1] === '未开始'" @click="rescindEvent(scope.row.event_id)">撤销</el-button>
         </template>
       </el-table-column>
     </el-table>
+
+    <!-- 分页条 -->
+    <div class="pagination-container">
+      <el-pagination
+          background
+          :current-page.sync="page"
+          layout="prev, pager, next"
+          :total="300"
+          :page-size="10"
+          @current-change="getMyEvent()"
+      ></el-pagination>
+    </div>
   </div>
 </template>
 
 <script>
+import {mapMutations} from 'vuex'
+import {getMyEvent} from '@/api/myEventTable/getMyEvent'
+import {rescindEvent} from "@/api/myEventTable/rescindEvent";
 export default {
   name: "myEventTable",
   data() {
     return {
-      eventTableData: [{
-        start_time: '2025-02-12 20:00',
-        end_time: '2025-02-12 23:00',
-        sport: '篮球',
-        players: '软件1223VS软件1224',
-        venue: '1号篮球场',
-        state: '待审核',
-        responsiblePerson: '张三',
-        note: '备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注'
-      }, {
-        start_time: '2025-02-12 17:00',
-        end_time: '2025-02-12 20:00',
-        sport: '足球',
-        players: '土木1223VS土木1224',
-        venue: '1号足球场',
-        state: '已否决',
-        responsiblePerson: '李四',
-        note: '备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注'
-      }, {
-        start_time: '2025-02-12 15:00',
-        end_time: '2025-02-12 16:00',
-        sport: '排球',
-        players: '能源1223VS能源1224',
-        venue: '2号排球场',
-        state: '已通过',
-        responsiblePerson: '王五',
-        note: '备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注'
-      }, {
-        start_time: '2025-02-12 15:00',
-        end_time: '2025-02-12 16:00',
-        sport: '排球',
-        players: '能源1223VS能源1224',
-        venue: '2号排球场',
-        state: '待付款',
-        responsiblePerson: '赵六',
-        note: '备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注'
-      }],
+      loading: false,
       search: '',
-      loading: false
+      review_status: '0',
+      page: 1
     }
   },
   methods: {
-    handleEdit(index, row) {
-      console.log(index, row);
+    // vuex辅助修改函数
+    ...mapMutations(['updateMyEventTableData']),
+
+    /* 静态资源使用的函数 */
+    handleClick(tab, event) {
+      this.getMyEvent();
     },
+
     filterTag(value, row) {
       return this.chooseTag(row.start_time, row.end_time)[1] === value;
     },
-    handleDelete(index, row) {
-      console.log(index, row);
-    },
+
+    // 根据比赛时间和当前时间进行比较，确认比赛状态
     chooseTag(startTime, endTime) {
       const currentTime = new Date();
       const startDate = new Date(startTime);
       const endDate = new Date(endTime)
-      if (currentTime < startDate) {
-        // 未开始
-        return ['info', '未开始'];
+      if (currentTime < startDate) {return ['info', '未开始'];}
+      if (currentTime >= startDate && currentTime <= endDate) {return ['success', '正在举行'];}
+      if (currentTime > endDate) {return ['warning', '已结束'];}
+    },
+
+    /* 用于后端交互并渲染数据的函数 */
+    // 获取我的赛事表格的数据并且渲染在表格组件上
+    async getMyEvent() {
+      this.loading = true;
+      try {
+        const data = await getMyEvent(this.page, this.search, this.review_status);
+        this.updateMyEventTableData(data);
+      } catch (error) {
+        this.updateMyEventTableData([]); // 清空我的赛事表格数据
+        this.$message.error('操作失败，请重试'); // 提示失败
+        console.error('获取我的赛事失败:', error);
+      } finally {
+        this.loading = false;
       }
-      if (currentTime >= startDate && currentTime <= endDate) {
-        // 正在举行
-        return ['success', '正在举行'];
-      }
-      if (currentTime > endDate) {
-        // 已结束
-        return ['warning', '已结束'];
+    },
+
+    // 撤销未审核、已通过的赛事
+    async rescindEvent(event_id) {
+      try {
+        const data = await rescindEvent(event_id); // 撤销某项赛事
+        this.page = 1;
+        this.search = '';
+        await this.getMyEvent(); // 重新获取我的赛事数据
+      } catch (error) {
+        this.$message.error('操作失败，请重试'); // 提示失败
+        console.error('撤销赛事失败:', error);
       }
     }
-  },
-  props: ['tableState']
+  }
 }
 </script>
 
 <style>
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 75vh; /* 容器占满整个视口高度 */
+}
 
+.dynamic-height-table {
+  flex: 1; /* 表格占据剩余空间 */
+  overflow-y: auto; /* 如果数据超过高度，显示滚动条 */
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  margin-top: 20px; /* 分页条与表格的间距 */
+}
 </style>

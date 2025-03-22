@@ -13,7 +13,7 @@ import AuditEvent from '../views/AuditEvent.vue'
 Vue.use(Router)
 
 const routes = [
-  {path: '/', name: 'EventsHome', component: Home},
+  {path: '/', component: GetEvent},
   {path: '/GetEvent', component: GetEvent},
   {path: '/AddEvent', component: AddEvent},
   {path: '/MyEvent', component: MyEvent},

@@ -1,11 +1,12 @@
 <template>
-  <div>
+  <div class="container">
     <el-table
-        :data="eventTableData.filter(data => !search || data.sport.toLowerCase().includes(search.toLowerCase()))"
+        :data="$store.state.eventTableData"
         style="width: 100%"
-        empty-text = "暂无数据"
-        height="68vh"
-        v-loading = "loading">
+        empty-text="暂无数据"
+        v-loading="loading"
+        class="dynamic-height-table"
+        height="75vh">
       <el-table-column
           label="比赛时间">
             <template slot-scope="scope">
@@ -14,26 +15,25 @@
       </el-table-column>
       <el-table-column
           label="比赛项目"
-          prop="sport">
+          prop="event_sport">
       </el-table-column>
       <el-table-column
-          label="参赛双方"
-          prop="players">
+          label="参赛方"
+          prop="participants">
       </el-table-column>
       <el-table-column
           label="比赛场地"
-          prop="venue">
+          prop="venue_name">
       </el-table-column>
       <el-table-column
           label="负责人"
-          prop="responsiblePerson">
+          prop="responsible_person">
       </el-table-column>
       <el-table-column
           label="备注"
           prop="note">
       </el-table-column>
       <el-table-column
-          prop="state"
           label="比赛状态"
           width="100"
           :filters="[{ text: '已结束', value: '已结束' }, { text: '未开始', value: '未开始'}, { text: '正在举行', value: '正在举行' }]"
@@ -47,84 +47,153 @@
       </el-table-column>
 
       <el-table-column
-          align="right">
+          align="right"
+          fixed="right">
         <template slot="header" slot-scope="scope">
-          <el-input
-              v-model="search"
+          <el-button
+              @click="filterDrawerVisiable = true"
+              type="success"
               size="mini"
-              placeholder="输入关键字搜索"/>
+              style="width: 70px; margin-left: auto; margin-right: 20px;">
+            过滤器
+          </el-button>
         </template>
+
         <template slot-scope="scope">
           <el-button
               size="mini"
-              @click="handleEdit(scope.$index, scope.row)">关注</el-button>
+              type="primary"
+              @click="handleEventFollow(scope.row.event_id)" v-if="!scope.row.is_followed">关注</el-button>
+          <el-button
+              size="mini"
+              type="danger"
+              @click="handleEventFollow(scope.row.event_id)" v-else>取关</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <el-empty description="无内容" v-show="eventTableData.length <= 0"></el-empty>
+    <!-- 分页条 -->
+    <div class="pagination-container">
+      <el-pagination
+          background
+          :current-page.sync="page"
+          layout="prev, pager, next"
+          :total="300"
+          :page-size="10"
+          @current-change="getEvent()"
+      ></el-pagination>
+    </div>
+
+    <el-drawer
+        title="过滤器"
+        :visible.sync="filterDrawerVisiable"
+        direction="ltr"
+        @close="getEvent">
+      <el-form label-position="right" label-width="80px" :model="search">
+        <el-form-item label="比赛项目">
+          <el-select v-model="search.event_sport" multiple placeholder="请选择" style="width: 80%">
+            <el-option
+                v-for="item in [{value: '篮球',label: '篮球'}, {value: '足球',label: '足球'}]"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="比赛场地">
+          <el-select v-model="search.venue_name" multiple placeholder="请选择" style="width: 80%">
+            <el-option
+                v-for="item in [{value: '1号篮球场',label: '1号篮球场'}, {value: '1号足球场',label: '1号足球场'}]"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="参赛人员">
+          <el-input v-model="search.participant" placeholder="请输入参赛人员" style="width: 80%"></el-input>
+        </el-form-item>
+        <el-form-item label="比赛时间">
+          <div class="block">
+            <el-date-picker
+                v-model="search.event_time"
+                type="datetime"
+                placeholder="选择日期时间"
+                style="width: 80%"
+                value-format="yyyy-MM-dd HH:mm:ss"
+                format="yyyy-MM-dd HH:mm">
+            </el-date-picker>
+          </div>
+        </el-form-item>
+      </el-form>
+    </el-drawer>
   </div>
 </template>
 
 <script>
+import {mapMutations} from 'vuex'
+import {getEvent} from '@/api/eventTable/getEvent'
+import {getFollowEvent} from "@/api/followEventTable/getFollowEvent";
+import {handleEventFollow} from "@/api/followEventTable/handleEventFollow";
+
 export default {
   name: "eventTable",
   data() {
     return {
-      eventTableData: [{
-        start_time: '2025-02-13 20:00',
-        end_time: '2025-02-13 23:00',
-        sport: '篮球',
-        players: '软件1223VS软件1224',
-        venue: '1号篮球场',
-        state: '已付款',
-        responsiblePerson: '张三',
-        note: '备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注'
-      }, {
-        start_time: '2025-02-13 20:00',
-        end_time: '2025-02-13 23:00',
-        sport: '足球',
-        players: '土木1223VS土木1224',
-        venue: '1号足球场',
-        state: '已付款',
-        responsiblePerson: '李四',
-        note: '备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注'
-      }, {
-        start_time: '2025-02-13 11:00',
-        end_time: '2025-02-13 24:00',
-        sport: '排球',
-        players: '能源1223VS能源1224',
-        venue: '2号排球场',
-        state: '已付款',
-        responsiblePerson: '王五',
-        note: '备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注'
-      }],
-      search: '',
-      loading: false
+      filterDrawerVisiable: false, // 过滤器抽屉是否出现
+      loading: false, // 加载状态
+      page: 1, // 查询页数
+      search: {
+        event_sport: [],
+        event_time: '',
+        participant: '',
+        venue_name: []
+      }, // 过滤器
     }
   },
   methods: {
-    handleEdit(index, row) {
-      console.log(index, row);
-    },
+    // vuex辅助修改函数
+    ...mapMutations(['updateEventTableData', 'updateFollowEventTableData']),
+
+    /* 静态资源使用的函数 */
     filterTag(value, row) {
       return this.chooseTag(row.start_time, row.end_time)[1] === value;
     },
+
+    // 根据比赛时间和当前时间进行比较，确认比赛状态
     chooseTag(startTime, endTime) {
       const currentTime = new Date();
       const startDate = new Date(startTime);
       const endDate = new Date(endTime)
-      if (currentTime < startDate) {
-        // 未开始
-        return ['info', '未开始'];
+      if (currentTime < startDate) {return ['info', '未开始'];}
+      if (currentTime >= startDate && currentTime <= endDate) {return ['success', '正在举行'];}
+      if (currentTime > endDate) {return ['warning', '已结束'];}
+    },
+
+    /* 用于后端交互并渲染数据的函数 */
+    // 获取赛事表格的数据并且渲染在表格组件上
+    async getEvent() {
+      this.loading = true;
+      try {
+        const data = await getEvent(this.page, this.search, 1); // 1表示"已通过"
+        this.updateEventTableData(data);
+      } catch (error) {
+        this.updateEventTableData([]);
+        this.$message.error('操作失败，请重试'); // 提示失败0
+        console.error('获取数据失败:', error);
+      } finally {
+        this.loading = false;
       }
-      if (currentTime >= startDate && currentTime <= endDate) {
-        // 正在举行
-        return ['success', '正在举行'];
-      }
-      if (currentTime > endDate) {
-        // 已结束
-        return ['warning', '已结束'];
+    },
+
+    // 关注或取消关注赛事
+    async handleEventFollow(event_id) {
+      try {
+        const data = await handleEventFollow(event_id);
+        await this.getEvent();
+      } catch (error) {
+        this.$message.error('操作失败，请重试'); // 提示失败
+        console.error('关注或取消关注赛事失败:', error);
       }
     }
   }
@@ -132,5 +201,20 @@ export default {
 </script>
 
 <style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 67.7vh; /* 容器占满整个视口高度 */
+}
 
+.dynamic-height-table {
+  flex: 1; /* 表格占据剩余空间 */
+  overflow-y: auto; /* 如果数据超过高度，显示滚动条 */
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  margin-top: 20px; /* 分页条与表格的间距 */
+}
 </style>

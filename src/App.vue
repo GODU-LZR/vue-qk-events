@@ -4,7 +4,7 @@
 
     <div class="line"></div>
     <el-menu
-        :default-active="$route.path"
+        default-active="/GetEvent"
         class="el-menu-demo"
         mode="horizontal"
         @select="handleSelect"

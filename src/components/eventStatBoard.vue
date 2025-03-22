@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div style="height: 54px;">
     <el-row :gutter="20" style="width: 100%">
       <el-col :span="6">
         <div>
           <el-statistic
               group-separator=","
               :precision="0"
-              :value="totalEventCount"
+              :value="$store.state.statData.totalEventCount"
               title="总共比赛数目"
           ></el-statistic>
         </div>
@@ -16,7 +16,7 @@
           <el-statistic
               group-separator=","
               :precision="0"
-              :value="monthEventCount"
+              :value="$store.state.statData.monthEventCount"
               title="本月比赛数目"
           ></el-statistic>
         </div>
@@ -27,7 +27,7 @@
               group-separator=","
               :precision="0"
               decimal-separator="."
-              :value="todayEventCount"
+              :value="$store.state.statData.todayEventCount"
               title="今日比赛数目"
           >
             <template slot="prefix">
@@ -41,18 +41,18 @@
       </el-col>
       <el-col :span="6">
         <div>
-          <el-statistic :value="likeCount" title="好评数量" group-separator=",">
-            <template slot="suffix">
-              <span @click="updateLikeCount()" class="like">
-                <i
-                    class="el-icon-star-on"
-                    style="color:red"
-                    v-show="!!like"
-                ></i>
-                <i class="el-icon-star-off" v-show="!like"></i>
-              </span>
+          <el-statistic
+              group-separator=","
+              :precision="0"
+              :value="$store.state.statData.todayWaitEventCount"
+              title="今日待举办赛事数目"
+          >
+            <template slot="prefix">
+              <i class="el-icon-s-flag" style="color: red"></i>
             </template>
-          </el-statistic>
+            <template slot="suffix">
+              <i class="el-icon-s-flag" style="color: blue"></i>
+            </template></el-statistic>
         </div>
       </el-col>
     </el-row>
@@ -60,35 +60,33 @@
 </template>
 
 <script>
+import {mapMutations} from 'vuex'
+import {getStat} from "@/api/eventTable/getStat";
 export default {
   name: "eventStatBoard",
   data() {
     return {
-      like: true,
-      likeCount: 1000,
-      totalEventCount: 4154,
-      monthEventCount: 1314,
-      todayEventCount: 1000
     };
   },
   methods: {
-      //点赞状态发生修改后，先发送请求到后端，前端数据仅做修改，不重新获取后端数据
-      updateLikeCount() {
-        if (this.like) {
-          this.likeCount = this.likeCount - 1;
-        } else {
-          this.likeCount = this.likeCount + 1;
-        }
-        this.like = !this.like;
+    // vuex辅助修改函数
+    ...mapMutations(['updateStatData']),
+
+    /* 用于后端交互并渲染数据的函数 */
+    // 获取统计赛事数据
+    async getStat() {
+      try {
+        const data = await getStat();
+        this.updateStatData(data);
+      } catch (error) {
+        this.$message.error('获取统计赛事数据失败，请重试'); // 提示失败
+        console.error('获取统计赛事数据失败:', error);
       }
+    }
   }
 }
 </script>
 
 <style scoped>
-.like {
-  cursor: pointer;
-  font-size: 25px;
-  display: inline-block;
-}
+
 </style>

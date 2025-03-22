@@ -8,7 +8,7 @@
 
     <h2>我的关注</h2>
 
-    <followEventSwitchBoard></followEventSwitchBoard>
+    <followEventDropdown></followEventDropdown>
     <followEventTable></followEventTable>
 
   </div>
@@ -17,12 +17,12 @@
 
 <script>
 import followEventTable from "../components/followEventTable"
-import followEventSwitchBoard from "../components/followEventSwitchBoard"
+import followEventDropdown from '../components/followEventDropdown'
 export default {
   name: "FollowEvent",
   components: {
     followEventTable: followEventTable,
-    followEventSwitchBoard: followEventSwitchBoard
+    followEventDropdown: followEventDropdown
   }
 }
 </script>

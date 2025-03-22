@@ -1,10 +1,11 @@
 <template>
-  <div>
+  <div class="container">
     <el-table
-        :data="eventTableData.filter(data => !search || data.sport.toLowerCase().includes(search.toLowerCase()))"
+        :data="$store.state.followEventTableData"
         style="width: 100%"
         empty-text = "暂无数据"
-        height="68vh"
+        class="dynamic-height-table"
+        height="75vh"
         v-loading = "loading">
       <el-table-column
           label="比赛时间">
@@ -14,26 +15,25 @@
       </el-table-column>
       <el-table-column
           label="比赛项目"
-          prop="sport">
+          prop="event_sport">
       </el-table-column>
       <el-table-column
-          label="参赛双方"
-          prop="players">
+          label="参赛方"
+          prop="participants">
       </el-table-column>
       <el-table-column
           label="比赛场地"
-          prop="venue">
+          prop="venue_name">
       </el-table-column>
       <el-table-column
           label="负责人"
-          prop="responsiblePerson">
+          prop="responsible_person">
       </el-table-column>
       <el-table-column
           label="备注"
           prop="note">
       </el-table-column>
       <el-table-column
-          prop="state"
           label="比赛状态"
           width="100"
           :filters="[{ text: '已结束', value: '已结束' }, { text: '未开始', value: '未开始'}, { text: '正在举行', value: '正在举行' }]"
@@ -47,68 +47,57 @@
       </el-table-column>
 
       <el-table-column
-          align="right">
+          align="right"
+          fixed="right">
         <template slot="header" slot-scope="scope">
           <el-input
               v-model="search"
               size="mini"
-              placeholder="输入关键字搜索"/>
+              placeholder="输入关键字搜索"
+              @change="getFollowEvent"/>
         </template>
         <template slot-scope="scope">
           <el-button
               size="mini"
-              @click="handleEdit(scope.$index, scope.row)"
               type="danger">取消关注</el-button>
         </template>
       </el-table-column>
-
     </el-table>
 
-    <el-empty description="无内容" v-show="eventTableData.length <= 0"></el-empty>
+    <!-- 分页条 -->
+    <div class="pagination-container">
+      <el-pagination
+          background
+          :current-page.sync="page"
+          layout="prev, pager, next"
+          :total="300"
+          :page-size="10"
+          @current-change="getFollowEvent()"
+      ></el-pagination>
+    </div>
   </div>
 </template>
 
 <script>
+import {mapMutations} from 'vuex'
+import {getFollowEvent} from "@/api/followEventTable/getFollowEvent";
+import {handleEventFollow} from "@/api/followEventTable/handleEventFollow";
+import {handleAutoDeleted} from "@/api/followEventTable/handleAutoDeleted";
+import {handleNotice} from "@/api/followEventTable/handleNotice";
 export default {
   name: "followEventTable",
   data() {
     return {
-      eventTableData: [{
-        start_time: '2025-02-13 20:00',
-        end_time: '2025-02-13 23:00',
-        sport: '篮球',
-        players: '软件1223VS软件1224',
-        venue: '1号篮球场',
-        state: '已付款',
-        responsiblePerson: '张三',
-        note: '备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注'
-      }, {
-        start_time: '2025-02-13 20:00',
-        end_time: '2025-02-13 23:00',
-        sport: '足球',
-        players: '土木1223VS土木1224',
-        venue: '1号足球场',
-        state: '已付款',
-        responsiblePerson: '李四',
-        note: '备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注'
-      }, {
-        start_time: '2025-02-13 11:00',
-        end_time: '2025-02-13 24:00',
-        sport: '排球',
-        players: '能源1223VS能源1224',
-        venue: '2号排球场',
-        state: '已付款',
-        responsiblePerson: '王五',
-        note: '备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注备注'
-      }],
       search: '',
-      loading: false
+      loading: false,
+      page: 1
     }
   },
   methods: {
-    handleEdit(index, row) {
-      console.log(index, row);
-    },
+    // vuex辅助修改函数
+    ...mapMutations(['updateFollowEventTableData']),
+
+    /* 静态资源使用的函数 */
     filterTag(value, row) {
       return this.chooseTag(row.start_time, row.end_time)[1] === value;
     },
@@ -116,17 +105,35 @@ export default {
       const currentTime = new Date();
       const startDate = new Date(startTime);
       const endDate = new Date(endTime)
-      if (currentTime < startDate) {
-        // 未开始
-        return ['info', '未开始'];
+      if (currentTime < startDate) {return ['info', '未开始'];}
+      if (currentTime >= startDate && currentTime <= endDate) {return ['success', '正在举行'];}
+      if (currentTime > endDate) {return ['warning', '已结束'];}
+    },
+
+    /* 用于后端交互并渲染数据的函数 */
+    // 获取关注赛事表格的数据并且渲染在表格组件上
+    async getFollowEvent() {
+      this.loading = true;
+      try {
+        const data = await getFollowEvent(this.page, this.search);
+        this.updateFollowEventTableData(data);
+      } catch (error) {
+        this.updateFollowEventTableData([]);
+        this.$message.error('操作失败，请重试'); // 提示失败
+        console.error('获取关注赛事数据失败:', error);
+      } finally {
+        this.loading = false;
       }
-      if (currentTime >= startDate && currentTime <= endDate) {
-        // 正在举行
-        return ['success', '正在举行'];
-      }
-      if (currentTime > endDate) {
-        // 已结束
-        return ['warning', '已结束'];
+    },
+
+    // 关注或取消关注赛事，在这组件里，理论上只有取消关注功能
+    async handleEventFollow(event_id) {
+      try {
+        const data = await handleEventFollow(event_id);
+        await this.getFollowEvent();
+      } catch (error) {
+        this.$message.error('操作失败，请重试'); // 提示失败
+        console.error('关注或取消关注赛事失败:', error);
       }
     }
   }
@@ -134,5 +141,20 @@ export default {
 </script>
 
 <style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 67.7vh; /* 容器占满整个视口高度 */
+}
 
+.dynamic-height-table {
+  flex: 1; /* 表格占据剩余空间 */
+  overflow-y: auto; /* 如果数据超过高度，显示滚动条 */
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  margin-top: 20px; /* 分页条与表格的间距 */
+}
 </style>
