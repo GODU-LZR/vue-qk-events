@@ -25,20 +25,14 @@
           prop="event_sport">
       </el-table-column>
       <el-table-column
-          label="参赛双方"
-          prop="participants">
+          label="参赛方">
+        <template slot-scope="scope">
+          {{ scope.row.participants.map((team) => { return team.teamName}).join(" VS ") }}
+        </template>
       </el-table-column>
       <el-table-column
           label="比赛场地"
           prop="venue_name">
-      </el-table-column>
-      <el-table-column
-          label="负责人"
-          prop="responsible_person">
-      </el-table-column>
-      <el-table-column
-          label="备注"
-          prop="note">
       </el-table-column>
       <el-table-column
           prop="state"
@@ -64,10 +58,13 @@
               placeholder="输入关键字搜索"
               @change="getMyEvent"/>
         </template>
-        <template slot-scope="scope" v-if="review_status === '0' || review_status === '1'">
+        <template slot-scope="scope">
           <el-button
               size="mini"
-              type="danger" v-if="chooseTag(scope.row.start_time, scope.row.end_time)[1] === '未开始'" @click="rescindEvent(scope.row.event_id)">撤销</el-button>
+              @click="showDetailEvent(scope.row)">赛事详情</el-button>
+          <el-button
+              size="mini"
+              type="danger" v-if="(scope.row.review_status === 0 || scope.row.review_status === 1) && chooseTag(scope.row.start_time, scope.row.end_time)[1] === '未开始'" @click="rescindEvent(scope.row.event_id)">撤销</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -83,21 +80,34 @@
           @current-change="getMyEvent()"
       ></el-pagination>
     </div>
+
+    <!--赛事详情-->
+    <el-dialog title="赛事详情" :visible.sync="eventDetailDrawerVisiable" top="30px">
+      <eventInfo
+          :event="detailEvent"></eventInfo>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import {mapMutations} from 'vuex'
+import eventInfo from '../eventTable/eventInfo'
 import {getMyEvent} from '@/api/myEventTable/getMyEvent'
 import {rescindEvent} from "@/api/myEventTable/rescindEvent";
 export default {
   name: "myEventTable",
+  components: {
+    eventInfo: eventInfo
+  },
   data() {
     return {
       loading: false,
       search: '',
       review_status: '0',
-      page: 1
+      page: 1,
+
+      eventDetailDrawerVisiable: false,
+      detailEvent: {}
     }
   },
   methods: {
@@ -121,6 +131,12 @@ export default {
       if (currentTime < startDate) {return ['info', '未开始'];}
       if (currentTime >= startDate && currentTime <= endDate) {return ['success', '正在举行'];}
       if (currentTime > endDate) {return ['warning', '已结束'];}
+    },
+
+    // 展示赛事详细信息
+    showDetailEvent(detailEvent) {
+      this.detailEvent = detailEvent;
+      this.eventDetailDrawerVisiable = true;
     },
 
     /* 用于后端交互并渲染数据的函数 */

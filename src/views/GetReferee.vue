@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import refereeUL from "../components/refereeUL"
+import refereeUL from "../components/refereeUL/refereeUL"
 export default {
   name: "GetReferee",
   components: {

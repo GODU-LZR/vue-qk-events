@@ -7,15 +7,13 @@
 
     <h2>查询赛事</h2>
 
-    <eventStatBoard></eventStatBoard>
-
     <eventTable></eventTable>
   </div>
 </template>
 
 <script>
-import eventStatBoard from "../components/eventStatBoard"
-import eventTable from "../components/eventTable"
+import eventStatBoard from "../components/eventTable/eventStatBoard"
+import eventTable from "../components/eventTable/eventTable"
 export default {
   name: "GetEvent",
   components: {

@@ -91,7 +91,11 @@
         </el-form-item>
 
         <el-form-item label="擅长项目">
-          <el-select v-model="form.sports" multiple placeholder="请选择" class="custom-select" filterable :clearable="true">
+          <el-select v-model="form.sports"
+                     multiple placeholder="请选择"
+                     class="custom-select"
+                     filterable
+                     :clearable="true">
             <el-option
                 v-for="item in [{value: '篮球', label: '篮球'}, {value: '足球', label: '足球'}, {value: '排球', label: '排球'}, {value: '羽毛球', label: '羽毛球'}, {value: '乒乓球', label: '乒乓球'}]"
                 :key="item.value"

@@ -8,50 +8,129 @@ export default new Vuex.Store({
     // evenTable表格数据
     eventTableData: [{
       event_id: 123456,
+      schedule_id: 1,
       event_sport: '篮球',
-      participants: '软件1223、软件1224',
       venue_name: '篮球场1号',
       start_time: '2025-01-01 12:00',
       end_time: '2025-01-01 13:00',
       responsible_person: '张三',
+      phone: 12345678,
       note: '备注备注备注备注备注备注备注备注备注备注',
       review_status: 1,
-      is_followed: 1 // 1表示关注,0表示未关注
+      is_followed: 1, // 1表示关注,0表示未关注
+      participants: [
+        {
+          teamName: '软件1223',
+          team_score: 90,
+          players: [{name: '张三', person_score: '40'}, {name: '李四', person_score: '30'}, {name: '王五', person_score: '20'}]
+        },
+        {
+          teamName: '软件1224',
+          team_score: 80,
+          players: [{name: '赵大', person_score: '20'}, {name: '刘二', person_score: '30'}, {name: '齐六', person_score: '40'}]
+        }
+      ]
     }, {
       event_id: 123457,
+      schedule_id: null,
       event_sport: '足球',
-      participants: '土木1223、土木1224',
       venue_name: '足球场1号',
       start_time: '2025-01-01 12:00',
       end_time: '2025-01-01 13:00',
       responsible_person: '李四',
+      phone: 12345678,
       note: '备注备注备注备注备注备注备注备注备注备注',
       review_status: 1,
-      is_followed: 0
+      is_followed: 0,
+      participants: [
+        {
+          teamName: '土木1223',
+          team_score: 90,
+          players: [{name: '张三', person_score: '40'}, {name: '李四', person_score: '30'}, {name: '王五', person_score: '20'}]
+        },
+        {
+          teamName: '土木1224',
+          team_score: 80,
+          players: [{name: '赵大', person_score: '20'}, {name: '刘二', person_score: '30'}, {name: '齐六', person_score: '40'}]
+        }
+      ]
     }],
 
     myEventTableData: [{
-      event_id: 123457,
-      event_sport: '足球',
-      participants: '土木1223、土木1224',
-      venue_name: '足球场1号',
+      event_id: 123456,
+      schedule_id: 1,
+      event_sport: '篮球',
+      venue_name: '篮球场1号',
       start_time: '2026-01-01 12:00',
       end_time: '2026-01-01 13:00',
-      responsible_person: '李四',
+      responsible_person: '张三',
+      phone: 12345678,
       note: '备注备注备注备注备注备注备注备注备注备注',
+      review_status: 1,
+      is_followed: 1, // 1表示关注,0表示未关注
+      participants: [
+        {
+          teamName: '软件1223',
+          team_score: 90,
+          players: [{name: '张三', person_score: '40'}, {name: '李四', person_score: '30'}, {name: '王五', person_score: '20'}]
+        },
+        {
+          teamName: '软件1224',
+          team_score: 80,
+          players: [{name: '赵大', person_score: '20'}, {name: '刘二', person_score: '30'}, {name: '齐六', person_score: '40'}]
+        }
+      ]
     }],
 
     // followEventTable表格数据
     followEventTableData: [{
       event_id: 123456,
+      schedule_id: 1,
       event_sport: '篮球',
-      participants: '软件1223、软件1224',
       venue_name: '篮球场1号',
-      start_time: '2025-01-01 12:00',
-      end_time: '2025-01-01 13:00',
+      start_time: '2026-01-01 12:00',
+      end_time: '2026-01-01 13:00',
       responsible_person: '张三',
+      phone: 12345678,
       note: '备注备注备注备注备注备注备注备注备注备注',
       review_status: 1,
+      is_followed: 1, // 1表示关注,0表示未关注
+      participants: [
+        {
+          teamName: '软件1223',
+          team_score: 90,
+          players: [{name: '张三', person_score: '40'}, {name: '李四', person_score: '30'}, {name: '王五', person_score: '20'}]
+        },
+        {
+          teamName: '软件1224',
+          team_score: 80,
+          players: [{name: '赵大', person_score: '20'}, {name: '刘二', person_score: '30'}, {name: '齐六', person_score: '40'}]
+        }
+      ]
+    },{
+      event_id: 123456,
+      schedule_id: 1,
+      event_sport: '篮球',
+      venue_name: '篮球场1号',
+      start_time: '2026-01-01 12:00',
+      end_time: '2026-01-01 13:00',
+      responsible_person: '张三',
+      phone: 12345678,
+      note: '备注备注备注备注备注备注备注备注备注备注',
+      review_status: 1,
+      is_followed: 1, // 1表示关注,0表示未关注
+      participants: [
+        {
+          teamName: '软件1223',
+          team_score: 90,
+          players: [{name: '张三', person_score: '40'}, {name: '李四', person_score: '30'}, {name: '王五', person_score: '20'}]
+        },
+        {
+          teamName: '软件1224',
+          team_score: 80,
+          players: [{name: '赵大', person_score: '20'}, {name: '刘二', person_score: '30'}, {name: '齐六', person_score: '40'}]
+        }
+      ]
     }],
 
     // auditTable表格数据

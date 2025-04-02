@@ -17,11 +17,11 @@
         <span>自动删除已结束、已撤销的赛事</span>
         <div class="switch-container">
           <el-switch
-              v-model="value1"
+              v-model="autoDeleted"
               active-text="开启"
               inactive-text="取消"
-              active-value="开启"
-              inactive-value="取消"
+              active-value="1"
+              inactive-value="0"
               @change="confirmValue1"
           ></el-switch>
         </div>
@@ -31,11 +31,11 @@
         <span>关注赛事开始前5分钟通知</span>
         <div class="switch-container">
           <el-switch
-              v-model="value2"
+              v-model="notice"
               active-text="开启"
               inactive-text="取消"
-              active-value="开启"
-              inactive-value="取消"
+              active-value="1"
+              inactive-value="0"
               @change="handleNotice"
           ></el-switch>
         </div>
@@ -46,15 +46,15 @@
 
 <script>
 import {mapMutations} from 'vuex'
-import {getFollowEvent} from "@/api/followEventTable/getFollowEvent";
 import {handleAutoDeleted} from "@/api/followEventTable/handleAutoDeleted";
 import {handleNotice} from "@/api/followEventTable/handleNotice";
+import {getAutoDeletedAndNotice} from "@/api/followEventTable/getAutoDeletedAndNotice";
 export default {
   name: "FollowEventPopover",
   data() {
     return {
-      value1: '取消', // 开关的初始状态
-      value2: '取消'
+      autoDeleted: '0', // 开关的初始状态
+      notice: '0'
     };
   },
   methods: {
@@ -90,10 +90,21 @@ export default {
 
     /* 用于后端交互并渲染数据的函数 */
     // 开启和关闭自动删除已结束、已撤销的赛事的功能
+    async getAutoDeletedAndNotice() {
+      try {
+        const data = await getAutoDeletedAndNotice();
+        this.autoDeleted = data.autoDeleted;
+        this.notice = data.notice;
+      } catch (error) {
+        this.$message.error('获取开启和关闭自动删除状态失败，请重试'); // 提示失败
+        console.error('获取开启和关闭自动删除状态失败:', error);
+      }
+    },
+
     async handleAutoDeleted() {
       try {
         await handleAutoDeleted(); // 调用后端接口
-        this.$message.success('操作成功'); // 提示成功
+        this.$emit("autoDeleted");
       } catch (error) {
         this.value1 = '取消'; // 请求失败，重置状态
         this.$message.error('操作失败，请重试'); // 提示失败

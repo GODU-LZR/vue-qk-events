@@ -1,11 +1,13 @@
 <template>
   <div class="container">
+    <followEventDropdown
+        @autoDeleted="autoDeleted"></followEventDropdown>
     <el-table
         :data="$store.state.followEventTableData"
         style="width: 100%"
         empty-text = "暂无数据"
         class="dynamic-height-table"
-        height="75vh"
+        height="69vh"
         v-loading = "loading">
       <el-table-column
           label="比赛时间">
@@ -18,20 +20,14 @@
           prop="event_sport">
       </el-table-column>
       <el-table-column
-          label="参赛方"
-          prop="participants">
+          label="参赛方">
+        <template slot-scope="scope">
+          {{ scope.row.participants.map((team) => { return team.teamName}).join(" VS ") }}
+        </template>
       </el-table-column>
       <el-table-column
           label="比赛场地"
           prop="venue_name">
-      </el-table-column>
-      <el-table-column
-          label="负责人"
-          prop="responsible_person">
-      </el-table-column>
-      <el-table-column
-          label="备注"
-          prop="note">
       </el-table-column>
       <el-table-column
           label="比赛状态"
@@ -59,7 +55,11 @@
         <template slot-scope="scope">
           <el-button
               size="mini"
-              type="danger">取消关注</el-button>
+              @click="showDetailEvent(scope.row)">赛事详情</el-button>
+          <el-button
+              size="mini"
+              type="danger"
+              @click="handleEventFollow(scope.row.event_id)">取关</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -75,22 +75,37 @@
           @current-change="getFollowEvent()"
       ></el-pagination>
     </div>
+
+    <!-- 赛事详情 -->
+    <el-dialog title="赛事详情" :visible.sync="eventDetailDrawerVisiable" top="30px">
+      <eventInfo
+          :event="detailEvent"></eventInfo>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import {mapMutations} from 'vuex'
+import followEventDropdown from './followEventDropdown'
+import eventInfo from '../eventTable/eventInfo'
 import {getFollowEvent} from "@/api/followEventTable/getFollowEvent";
 import {handleEventFollow} from "@/api/followEventTable/handleEventFollow";
 import {handleAutoDeleted} from "@/api/followEventTable/handleAutoDeleted";
 import {handleNotice} from "@/api/followEventTable/handleNotice";
 export default {
   name: "followEventTable",
+  components: {
+    followEventDropdown: followEventDropdown,
+    eventInfo: eventInfo
+  },
   data() {
     return {
       search: '',
       loading: false,
-      page: 1
+      page: 1,
+
+      eventDetailDrawerVisiable: false,
+      detailEvent: {}
     }
   },
   methods: {
@@ -108,6 +123,20 @@ export default {
       if (currentTime < startDate) {return ['info', '未开始'];}
       if (currentTime >= startDate && currentTime <= endDate) {return ['success', '正在举行'];}
       if (currentTime > endDate) {return ['warning', '已结束'];}
+    },
+
+    // 展示赛事详细信息
+    showDetailEvent(detailEvent) {
+      this.detailEvent = detailEvent;
+      this.eventDetailDrawerVisiable = true;
+    },
+
+    // 开启自动删除后,重新获取数据
+    autoDeleted() {
+      console.log("你好");
+      this.page = 1;
+      this.search = '';
+      this.getFollowEvent();
     },
 
     /* 用于后端交互并渲染数据的函数 */
@@ -144,7 +173,7 @@ export default {
 .container {
   display: flex;
   flex-direction: column;
-  height: 67.7vh; /* 容器占满整个视口高度 */
+  height: 75vh; /* 容器占满整个视口高度 */
 }
 
 .dynamic-height-table {

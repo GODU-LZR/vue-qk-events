@@ -8,7 +8,6 @@
 
     <h2>我的关注</h2>
 
-    <followEventDropdown></followEventDropdown>
     <followEventTable></followEventTable>
 
   </div>
@@ -16,13 +15,11 @@
 </template>
 
 <script>
-import followEventTable from "../components/followEventTable"
-import followEventDropdown from '../components/followEventDropdown'
+import followEventTable from "../components/followEventTable/followEventTable"
 export default {
   name: "FollowEvent",
   components: {
     followEventTable: followEventTable,
-    followEventDropdown: followEventDropdown
   }
 }
 </script>

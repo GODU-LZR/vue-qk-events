@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import myEventTable from "../components/myEventTable"
+import myEventTable from "../components/myEventTable/myEventTable"
 export default {
   name: "MyEvent",
   components: {

@@ -14,6 +14,7 @@
       <el-submenu index="2">
         <template slot="title">我的工作台</template>
         <el-menu-item index="/AddEvent">预约赛事</el-menu-item>
+        <el-menu-item index="/FollowEvent">创建/更新赛程</el-menu-item>
         <el-menu-item index="/MyEvent">我的赛事</el-menu-item>
         <el-menu-item index="/FollowEvent">我的关注</el-menu-item>
       </el-submenu>

@@ -7,14 +7,15 @@
       <el-breadcrumb-item>预约赛事</el-breadcrumb-item>
     </el-breadcrumb>
 
+<!--    <h2>预约赛事</h2>-->
+<!--    <eventAddForm></eventAddForm>-->
     <h2>预约赛事</h2>
-    <eventAddForm></eventAddForm>
+      <eventAddForm></eventAddForm>
   </div>
-
 </template>
 
 <script>
-import eventAddForm from "../components/eventAddForm"
+import eventAddForm from "../components/eventAddForm/eventAddForm"
 export default {
   name: "AddEvent",
   components: {

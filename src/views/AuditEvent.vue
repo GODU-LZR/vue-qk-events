@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import auditTable from "../components/auditTable"
+import auditTable from "../components/auditTable/auditTable"
 export default {
   name: "AuditEvent",
   components: {

@@ -1,12 +1,13 @@
 <template>
   <div class="container">
+    <eventStatBoard></eventStatBoard>
     <el-table
         :data="$store.state.eventTableData"
         style="width: 100%"
         empty-text="暂无数据"
         v-loading="loading"
         class="dynamic-height-table"
-        height="75vh">
+        height="69vh">
       <el-table-column
           label="比赛时间">
             <template slot-scope="scope">
@@ -18,20 +19,14 @@
           prop="event_sport">
       </el-table-column>
       <el-table-column
-          label="参赛方"
-          prop="participants">
+          label="参赛方">
+        <template slot-scope="scope">
+          {{ scope.row.participants.map((team) => { return team.teamName}).join(" VS ") }}
+        </template>
       </el-table-column>
       <el-table-column
           label="比赛场地"
           prop="venue_name">
-      </el-table-column>
-      <el-table-column
-          label="负责人"
-          prop="responsible_person">
-      </el-table-column>
-      <el-table-column
-          label="备注"
-          prop="note">
       </el-table-column>
       <el-table-column
           label="比赛状态"
@@ -62,6 +57,9 @@
         <template slot-scope="scope">
           <el-button
               size="mini"
+              @click="showDetailEvent(scope.row)">赛事详情</el-button>
+          <el-button
+              size="mini"
               type="primary"
               @click="handleEventFollow(scope.row.event_id)" v-if="!scope.row.is_followed">关注</el-button>
           <el-button
@@ -90,6 +88,9 @@
         direction="ltr"
         @close="getEvent">
       <el-form label-position="right" label-width="80px" :model="search">
+        <el-form-item label="筛选赛程">
+          <el-input v-model="search.schedule_id" placeholder="请输入赛程id" style="width: 80%"></el-input>
+        </el-form-item>
         <el-form-item label="比赛项目">
           <el-select v-model="search.event_sport" multiple placeholder="请选择" style="width: 80%">
             <el-option
@@ -127,28 +128,44 @@
         </el-form-item>
       </el-form>
     </el-drawer>
+
+    <el-dialog title="赛事详情" :visible.sync="eventDetailDrawerVisiable" top="30px">
+      <eventInfo
+          :event="detailEvent"
+          :isSelectScheduleId="true"
+          @select-scheduleId="selectScheduleId"></eventInfo>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import {mapMutations} from 'vuex'
+import eventStatBoard from "./eventStatBoard"
+import eventInfo from '../eventTable/eventInfo'
 import {getEvent} from '@/api/eventTable/getEvent'
 import {getFollowEvent} from "@/api/followEventTable/getFollowEvent";
 import {handleEventFollow} from "@/api/followEventTable/handleEventFollow";
-
 export default {
   name: "eventTable",
+  components: {
+    eventInfo: eventInfo,
+    eventStatBoard: eventStatBoard
+  },
   data() {
     return {
       filterDrawerVisiable: false, // 过滤器抽屉是否出现
+      eventDetailDrawerVisiable: false,
       loading: false, // 加载状态
       page: 1, // 查询页数
       search: {
+        schedule_id: '',
         event_sport: [],
         event_time: '',
         participant: '',
         venue_name: []
       }, // 过滤器
+
+      detailEvent: {}
     }
   },
   methods: {
@@ -168,6 +185,24 @@ export default {
       if (currentTime < startDate) {return ['info', '未开始'];}
       if (currentTime >= startDate && currentTime <= endDate) {return ['success', '正在举行'];}
       if (currentTime > endDate) {return ['warning', '已结束'];}
+    },
+
+    // 展示赛事详细信息
+    showDetailEvent(detailEvent) {
+      this.detailEvent = detailEvent;
+      this.eventDetailDrawerVisiable = true;
+    },
+
+    // 查询赛程
+    selectScheduleId(schedule_id) {
+      this.search.schedule_id = schedule_id;
+      this.search.event_sport = [];
+      this.search.event_time = '';
+      this.search.participant = '';
+      this.search.venue_name = [];
+      this.page = 1;
+      this.eventDetailDrawerVisiable = false;
+      this.getEvent();
     },
 
     /* 用于后端交互并渲染数据的函数 */
@@ -204,7 +239,7 @@ export default {
 .container {
   display: flex;
   flex-direction: column;
-  height: 67.7vh; /* 容器占满整个视口高度 */
+  height: 75vh; /* 容器占满整个视口高度 */
 }
 
 .dynamic-height-table {
