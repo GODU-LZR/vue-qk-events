@@ -8,7 +8,6 @@
       <el-tab-pane label="已撤销" name="3"></el-tab-pane>
     </el-tabs>
 
-
     <el-table
         :data="$store.state.auditEventTableData"
         style="width: 100%"
@@ -27,20 +26,14 @@
           prop="event_sport">
       </el-table-column>
       <el-table-column
-          label="参赛双方"
-          prop="participants">
+          label="参赛方">
+        <template slot-scope="scope">
+          {{ scope.row.participants.map((team) => { return team.teamName}).join(" VS ") }}
+        </template>
       </el-table-column>
       <el-table-column
           label="比赛场地"
           prop="venue_name">
-      </el-table-column>
-      <el-table-column
-          label="负责人"
-          prop="responsible_person">
-      </el-table-column>
-      <el-table-column
-          label="备注"
-          prop="note">
       </el-table-column>
       <el-table-column
           prop="state"
@@ -70,23 +63,8 @@
         <template slot-scope="scope">
           <el-button
               size="mini"
-              @click="approvePendingEvent(scope.row.event_id)"
-              v-if="scope.row.review_status === 0">通过</el-button>
-          <el-button
-              size="mini"
-              type="danger"
-              @click="handleDelete(scope.row, '请输入否决原因')"
-              v-if="scope.row.review_status === 0">否决</el-button>
-          <el-button
-              size="mini"
-              type="danger"
-              @click="handleDelete(scope.row, '请输入撤销原因')"
-              v-if="scope.row.review_status === 1" :disabled="chooseTag(scope.row.start_time, scope.row.end_time)[1] !== '未开始'">撤销</el-button>
-          <el-button
-              size="mini"
               type="primary"
-              @click="handleDetail(scope.row)"
-              v-if="scope.row.review_status === 2 || scope.row.review_status === 3">查看详情</el-button>
+              @click="showDetailEvent(scope.row)">查看详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -104,68 +82,28 @@
     </div>
 
     <el-dialog
-        :title="rejectTitle"
-        :visible.sync="dialogVisible"
-        width="40%"
-        @close="handleCancel">
-
-      <el-descriptions title="赛事信息">
-        <el-descriptions-item label="比赛时间">{{ deleteFormData.start_time }} 至 {{ deleteFormData.end_time }}</el-descriptions-item>
-        <el-descriptions-item label="比赛项目">{{ deleteFormData.event_sport }}</el-descriptions-item>
-        <el-descriptions-item label="参赛双方">{{ deleteFormData.participants }}</el-descriptions-item>
-        <el-descriptions-item label="比赛场地">{{ deleteFormData.venue_name }}</el-descriptions-item>
-        <el-descriptions-item label="负责人">{{ deleteFormData.responsible_person }}</el-descriptions-item>
-        <el-descriptions-item label="联系电话">{{ deleteFormData.phone }}</el-descriptions-item>
-        <el-descriptions-item label="状态">{{ deleteFormData.review_status }}</el-descriptions-item>
-        <el-descriptions-item label="备注">{{ deleteFormData.note }}</el-descriptions-item>
-      </el-descriptions>
-
-      <el-input
-          type="textarea"
-          :rows="4"
-          :placeholder="rejectTitle"
-          v-model="reject_opinion"
-          resize="none"
-          style="border-radius: 10px">
-      </el-input>
-
-      <span slot="footer" class="dialog-footer">
-    <el-button @click="dialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="rejectAndCancelEvent">确 定</el-button>
-  </span>
-    </el-dialog>
-
-    <el-dialog
         title="详细信息"
         :visible.sync="detailDialogVisible"
-        width="40%"
-        @close="handleDetailCancel">
+        width="40%">
 
-      <el-descriptions title="赛事信息">
-        <el-descriptions-item label="比赛时间">{{ detailEventData.start_time }} 至 {{ detailEventData.end_time }}</el-descriptions-item>
-        <el-descriptions-item label="比赛项目">{{ detailEventData.event_sport }}</el-descriptions-item>
-        <el-descriptions-item label="参赛双方">{{ detailEventData.participants }}</el-descriptions-item>
-        <el-descriptions-item label="比赛场地">{{ detailEventData.venue_name }}</el-descriptions-item>
-        <el-descriptions-item label="负责人">{{ detailEventData.responsible_person }}</el-descriptions-item>
-        <el-descriptions-item label="联系电话">{{ detailEventData.phone }}</el-descriptions-item>
-        <el-descriptions-item label="状态">{{ detailEventData.review_status }}</el-descriptions-item>
-        <el-descriptions-item label="备注">{{ detailEventData.note }}</el-descriptions-item>
-      </el-descriptions>
-
+      <eventInfo :event="detailEvent"></eventInfo>
       <el-input
           type="textarea"
           :rows="4"
-          :placeholder="rejectTitle"
-          v-model="detailEventData.opinion"
           resize="none"
-          style="border-radius: 10px"
-          :disabled="true">
+          placeholder="请输入否决/撤销原因"
+          style="border-radius: 10px; margin-top: 20px"
+          :disabled="detailEvent.review_status === 2 || detailEvent.review_status === 3"
+          v-model="opinion">
       </el-input>
 
       <span slot="footer" class="dialog-footer">
-    <el-button @click="detailDialogVisible = false">取 消</el-button>
-    <el-button type="primary">确 定</el-button>
-  </span>
+        <el-button type="primary" v-if="detailEvent.review_status === 0" @click="approvePendingEvent">通 过</el-button>
+        <el-button type="danger" v-if="detailEvent.review_status === 0" @click="rejectAndCancelEvent">否 决</el-button>
+        <el-button type="danger" v-if="detailEvent.review_status === 1 &&
+                         chooseTag(detailEvent.start_time, detailEvent.end_time)[1] === '未开始'"
+                         @click="rejectAndCancelEvent">撤 销</el-button>
+      </span>
     </el-dialog>
 
     <el-drawer
@@ -197,8 +135,8 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="参赛人员">
-          <el-input v-model="search.participant" placeholder="请输入参赛人员" style="width: 80%"></el-input>
+        <el-form-item label="参赛队伍">
+          <el-input v-model="search.participant" placeholder="请输入参赛队伍" style="width: 80%"></el-input>
         </el-form-item>
         <el-form-item label="比赛时间">
           <div class="block">
@@ -219,11 +157,15 @@
 
 <script>
 import {mapMutations} from 'vuex'
+import eventInfo from '../eventTable/eventInfo'
 import {getAuditEvent} from '@/api/auditTable/getAuditEvent'
 import {approvePendingEvent} from "@/api/auditTable/approvePendingEvent";
 import {rejectAndCancelEvent} from "@/api/auditTable/rejectAndCancelEvent";
 export default {
   name: "auditTable",
+  components: {
+    eventInfo: eventInfo
+  },
   data() {
     return {
       filterDrawerVisible: false, // 过滤器抽屉是否出现
@@ -238,12 +180,11 @@ export default {
       review_status: "0",
       page:1,
 
-      deleteFormData: {}, // 否决和撤销的dialog信息
-      detailEventData: {}, // 已否决、已撤销的赛事详情信息
-      dialogVisible: false,
       detailDialogVisible: false,
-      reject_opinion: '',
-      rejectTitle: ''
+      detailEvent: {},
+
+      // 否决或撤销的原因
+      opinion: ''
     }
   },
   methods: {
@@ -253,31 +194,6 @@ export default {
     /* 静态资源使用的函数 */
     handleClick() {
       this.getAuditEvent();
-    },
-
-    // 将否决和撤销对应赛事的信息写入到展示dialog数据里
-    handleDelete(row, rejectTitle) {
-      this.rejectTitle = rejectTitle;
-      this.deleteFormData = row;
-      this.dialogVisible = true;
-    },
-
-    // 关闭dialog后触发的方法,用于消除dialog已有信息
-    handleCancel() {
-      this.deleteFormData = {};
-      this.reject_opinion = '';
-      this.rejectTitle = ''
-    },
-
-    // 将已否决和已撤销的赛事的信息,写入到展示dialog数据里
-    handleDetail(row) {
-      this.detailEventData = row;
-      this.detailDialogVisible = true;
-    },
-
-    // 关闭dialog后触发的方法,用于消除dialog已有信息
-    handleDetailCancel() {
-      this.detailEventData = {};
     },
 
     filterTag(value, row) {
@@ -295,8 +211,10 @@ export default {
     },
 
     // 将具体信息展示出来，只能用于已否决、已撤销的赛事，由于信息已经获取，因此只涉及前端内容
-    displayEventDetail(row) {
-
+    showDetailEvent(event) {
+      this.detailEvent = event;
+      this.opinion = event.opinion;
+      this.detailDialogVisible = true;
     },
 
     /* 用于后端交互并渲染数据的函数 */
@@ -316,9 +234,9 @@ export default {
     },
 
     // 通过待审核的赛事
-    async approvePendingEvent(event_id) {
+    async approvePendingEvent() {
       try {
-        const data = await approvePendingEvent(event_id);
+        const data = await approvePendingEvent(this.detailEvent.event_id);
         this.page = 1;
         this.search = '';
         await this.getAuditEvent();
@@ -330,8 +248,12 @@ export default {
 
     // 否决待审核、撤销已通过的赛事
     async rejectAndCancelEvent() {
+      if (this.opinion === '') {
+        this.$message.info('请填写否决/撤销信息');
+        return;
+      }
       try {
-        const data = await rejectAndCancelEvent(this.deleteFormData.event_id, this.reject_opinion);
+        const data = await rejectAndCancelEvent(this.detailEvent.event_id, this.opinion);
         this.page = 1;
         this.search = '';
         await this.getAuditEvent();

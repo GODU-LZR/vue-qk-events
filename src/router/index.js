@@ -9,6 +9,7 @@ import MyEvent from '../views/MyEvent.vue'
 import FollowEvent from '../views/FollowEvent.vue'
 import GetReferee from '../views/GetReferee.vue'
 import AuditEvent from '../views/AuditEvent.vue'
+import HandleSchedule from '../views/HandleSchedule'
 
 Vue.use(Router)
 
@@ -19,7 +20,8 @@ const routes = [
   {path: '/MyEvent', component: MyEvent},
   {path: '/FollowEvent', component: FollowEvent},
   {path: '/GetReferee', component: GetReferee},
-  {path: '/AuditEvent', component: AuditEvent}
+  {path: '/AuditEvent', component: AuditEvent},
+  {path: '/HandleSchedule', component: HandleSchedule}
 ]
 
 const router = new Router({

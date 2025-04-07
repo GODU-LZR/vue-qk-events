@@ -29,7 +29,7 @@
                 :value="item.value">
             </el-option>
           <div style="height: 34px; display: flex; justify-content: center; align-items: center;" v-if="eventSportLoading || eventSportNoMore">
-            <p v-if="eventSportLoading">加载中...</p>
+            <p v-if="eventSportLoading">加载中<i class="el-icon-loading"/></p>
             <p v-if="eventSportNoMore">没有更多了</p>
           </div>
         </el-select>
@@ -100,7 +100,7 @@
               :value="item.value">
           </el-option>
           <div style="height: 34px; display: flex; justify-content: center; align-items: center;" v-if="refereeLoading || refereeNoMore">
-            <p v-if="refereeLoading">加载中...</p>
+            <p v-if="refereeLoading">加载中<i class="el-icon-loading"/></p>
             <p v-if="refereeNoMore">没有更多了</p>
           </div>
         </el-select>

@@ -6,11 +6,11 @@
     </el-row>
 
     <el-row v-if="user === '超级管理员'" style="display: flex; justify-content: flex-end; margin-top: 10px">
-      <el-input v-model="search" placeholder="输入关键字搜索" size="small" style="width: 10%" @change="handleSearch"></el-input>
+      <el-input v-model="search" placeholder="输入关键字搜索" size="small" style="width: 150px" @change="handleSearch"></el-input>
     </el-row>
     <ul class="infinite-list"
         style="overflow:auto; height: 450px;"
-        @scroll="lazyLoad"
+        v-infinite-scroll="lazyLoad"
         v-loading="getLoading">
       <li v-for="data in $store.state.refereeULData" class="infinite-list-item" style="position: relative; padding-right: 30px;list-style: none; padding-top: 10px;">
 
@@ -218,14 +218,10 @@ export default {
     },
 
     // 懒加载数据
-    lazyLoad(event) {
+    lazyLoad() {
       if (this.lazyTimer) clearTimeout(this.lazyTimer); // 清除之前的定时器
       this.lazyTimer = setTimeout(() => {
-        const list = event.target;
-        const scrollBottom = list.scrollHeight - list.scrollTop - list.clientHeight;
-
-        // 当滚动到底部时触发加载方法
-        if (scrollBottom <= 1 && !this.addLoading && !this.noMoreData) {
+        if (!this.addLoading && !this.noMoreData) {
           this.getRefereeByAdd();
         }
       }, 300); // 设置防抖延迟时间（单位：毫秒）

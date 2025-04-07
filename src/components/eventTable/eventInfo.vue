@@ -103,10 +103,10 @@
         </el-descriptions-item>
         <el-descriptions-item label="负责人">{{ event.responsible_person }}</el-descriptions-item>
         <el-descriptions-item label="联系方式">{{ event.phone }}</el-descriptions-item>
-        <el-descriptions-item label="备注">
-          {{ event.note }}
-        </el-descriptions-item>
-        <el-descriptions-item label="关注状态">
+        <el-descriptions-item label="联系方式">{{ event.referee_name }}</el-descriptions-item>
+        <el-descriptions-item label="备注">{{ event.note }}</el-descriptions-item>
+        <el-descriptions-item label="审核状态">{{ getStatus(event.review_status) }}</el-descriptions-item>
+        <el-descriptions-item label="关注状态" v-if="event.is_followed">
           <el-tag :type="event.is_followed ? 'success' : 'info'">
             {{ event.is_followed ? '已关注' : '未关注' }}
           </el-tag>
@@ -133,6 +133,13 @@ export default {
     selectEventByScheduleId() {
       this.$emit("select-scheduleId", this.event.schedule_id);
     },
+
+    getStatus(review_status) {
+      if (review_status === 0) return '待审核';
+      if (review_status === 1) return '已审核';
+      if (review_status === 2) return '已否决';
+      if (review_status === 3) return '已撤销';
+    }
   }
 }
 </script>

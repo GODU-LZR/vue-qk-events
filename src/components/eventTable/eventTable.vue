@@ -92,27 +92,43 @@
           <el-input v-model="search.schedule_id" placeholder="请输入赛程id" style="width: 80%"></el-input>
         </el-form-item>
         <el-form-item label="比赛项目">
-          <el-select v-model="search.event_sport" multiple placeholder="请选择" style="width: 80%">
+          <el-select v-model="search.event_sport"
+                     multiple
+                     placeholder="请选择"
+                     style="width: 80%"
+                     v-el-select-loadmore="lazyLoadInEventSport">
             <el-option
-                v-for="item in [{value: '篮球',label: '篮球'}, {value: '足球',label: '足球'}]"
+                v-for="item in eventSport"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value">
             </el-option>
+            <div style="height: 34px; display: flex; justify-content: center; align-items: center;" v-if="eventSportLoading || eventSportNoMore">
+              <p v-if="eventSportLoading">加载中<i class="el-icon-loading"/></p>
+              <p v-if="eventSportNoMore">没有更多了</p>
+            </div>
           </el-select>
         </el-form-item>
         <el-form-item label="比赛场地">
-          <el-select v-model="search.venue_name" multiple placeholder="请选择" style="width: 80%">
+          <el-select v-model="search.venue_name"
+                     multiple
+                     placeholder="请选择"
+                     style="width: 80%"
+                     v-el-select-loadmore="lazyLoadInVenueName">
             <el-option
-                v-for="item in [{value: '1号篮球场',label: '1号篮球场'}, {value: '1号足球场',label: '1号足球场'}]"
+                v-for="item in venueName"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value">
             </el-option>
+            <div style="height: 34px; display: flex; justify-content: center; align-items: center;" v-if="venueNameLoading || venueNameNoMore">
+              <p v-if="venueNameLoading">加载中<i class="el-icon-loading"/></p>
+              <p v-if="venueNameNoMore">没有更多了</p>
+            </div>
           </el-select>
         </el-form-item>
-        <el-form-item label="参赛人员">
-          <el-input v-model="search.participant" placeholder="请输入参赛人员" style="width: 80%"></el-input>
+        <el-form-item label="参赛队伍">
+          <el-input v-model="search.participant" placeholder="请输入参赛队伍" style="width: 80%"></el-input>
         </el-form-item>
         <el-form-item label="比赛时间">
           <div class="block">
@@ -143,7 +159,8 @@ import {mapMutations} from 'vuex'
 import eventStatBoard from "./eventStatBoard"
 import eventInfo from '../eventTable/eventInfo'
 import {getEvent} from '@/api/eventTable/getEvent'
-import {getFollowEvent} from "@/api/followEventTable/getFollowEvent";
+import {getEventSport} from "@/api/eventAddForm/getEventSport";
+import {getVenueName} from "@/api/eventTable/getVenueName";
 import {handleEventFollow} from "@/api/followEventTable/handleEventFollow";
 export default {
   name: "eventTable",
@@ -165,7 +182,42 @@ export default {
         venue_name: []
       }, // 过滤器
 
-      detailEvent: {}
+      detailEvent: {},
+
+      eventSport: [{value: '跑步',label: '跑步'},
+                   {value: '游泳',label: '游泳'},
+                   {value: '吃鸡',label: '吃鸡'},
+                   {value: '篮球',label: '篮球'},
+                   {value: '足球',label: '足球'},
+                   {value: '排球',label: '排球'},
+                   {value: '台球',label: '台球'},
+                   {value: '网球',label: '网球'},
+                   {value: '冰球',label: '冰球'},
+                   {value: '乒乓球',label: '乒乓球'},
+                   {value: '羽毛球',label: '羽毛球'},
+                   {value: '保龄球',label: '保龄球'},
+                   {value: '接力赛',label: '接力赛'}],
+      eventSportPage: 1,
+      eventSportLoading : false,
+      eventSportNoMore: false,
+      eventSportTimer: null, // 这是用于防抖的计时器：加载盒子消失后，置为false,用计时器设置3秒后置为true,在此期间无法再次懒加载方法
+
+      venueName: [{value: '篮球馆1号',label: '篮球馆1号'},
+                 {value: '篮球馆2号',label: '篮球馆2号'},
+                 {value: '篮球馆3号',label: '篮球馆3号'},
+                 {value: '足球场1号',label: '足球场1号'},
+                 {value: '足球场2号',label: '足球场2号'},
+                 {value: '足球场3号',label: '足球场3号'},
+                 {value: '台球桌1号',label: '台球桌1号'},
+                 {value: '台球桌2号',label: '台球桌2号'},
+                 {value: '台球桌3号',label: '台球桌3号'},
+                 {value: '乒乓球桌1号',label: '乒乓球桌1号'},
+                 {value: '乒乓球桌2号',label: '乒乓球桌2号'},
+                 {value: '乒乓球桌3号',label: '乒乓球桌3号'}],
+      venueNamePage: 1,
+      venueNameLoading : false,
+      venueNameNoMore: false,
+      venueNameTimer: null, // 这是用于防抖的计时器：加载盒子消失后，置为false,用计时器设置3秒后置为true,在此期间无法再次懒加载方法
     }
   },
   methods: {
@@ -205,6 +257,30 @@ export default {
       this.getEvent();
     },
 
+    // 懒加载赛事项目信息数据
+    lazyLoadInEventSport() {
+      if (this.eventSportLoading || this.eventSportNoMore || this.eventSportTimer !== null) {
+        return;
+      }
+      this.getEventSport();
+      // 设置计时器，3秒内无法再次触发
+      this.eventSportTimer = setTimeout(() => {
+        this.eventSportTimer = null; // 计时器结束后重置为 null
+      }, 3000); // 3秒防抖时间
+    },
+
+    // 懒加载场地项目信息数据
+    lazyLoadInVenueName() {
+      if (this.venueNameLoading || this.venueNameNoMore || this.venueNameTimer !== null) {
+        return;
+      }
+      this.getVenueName();
+      // 设置计时器，3秒内无法再次触发
+      this.venueNameTimer = setTimeout(() => {
+        this.venueNameTimer = null; // 计时器结束后重置为 null
+      }, 3000); // 3秒防抖时间
+    },
+
     /* 用于后端交互并渲染数据的函数 */
     // 获取赛事表格的数据并且渲染在表格组件上
     async getEvent() {
@@ -229,6 +305,71 @@ export default {
       } catch (error) {
         this.$message.error('操作失败，请重试'); // 提示失败
         console.error('关注或取消关注赛事失败:', error);
+      }
+    },
+
+    // 获取赛事项目
+    async getEventSport() {
+      this.eventSportLoading = true;
+      try {
+        const data = await getEventSport(this.eventSportPage);
+        if (data.length > 0) {
+          // 数据格式转变为select读懂的格式
+          const newData = data.map(item => ({
+            value: item.eventSport,
+            label: item.eventSport,
+          }));
+          this.eventSport.push(...newData);
+          this.eventSportPage++; // 加载下一页
+        } else {
+          this.eventSportNoMore = true; // 没有更多数据
+        }
+      } catch (error) {
+        this.$message.error('获取赛事项目选项失败，请重试'); // 提示失败
+        console.error('获取赛事项目选项失败:', error);
+      } finally {
+        this.eventSportLoading = false;
+      }
+    },
+
+    // 获取赛事项目
+    async getVenueName() {
+      this.venueNameLoading = true;
+      try {
+        const data = await getVenueName(this.venueNamePage);
+        if (data.length > 0) {
+          // 数据格式转变为select读懂的格式
+          const newData = data.map(item => ({
+            value: item.venueName,
+            label: item.venueName,
+          }));
+          this.venueName.push(...newData);
+          this.venueNamePage++; // 加载下一页
+        } else {
+          this.venueNameNoMore = true; // 没有更多数据
+        }
+      } catch (error) {
+        this.$message.error('获取场地选项失败，请重试'); // 提示失败
+        console.error('获取场地选项失败:', error);
+      } finally {
+        this.venueNameLoading = false;
+      }
+    },
+  },
+  directives: {
+    /** 下拉框懒加载 */
+    'el-select-loadmore': {
+      bind(el, binding) {
+        const SELECTWRAP_DOM = el.querySelector(
+            '.el-select-dropdown .el-select-dropdown__wrap'
+        );
+        SELECTWRAP_DOM.addEventListener('scroll', function() {
+          const condition =
+              this.scrollHeight - this.scrollTop <= this.clientHeight;
+          if (condition) {
+            binding.value();
+          }
+        });
       }
     }
   }

@@ -11,6 +11,7 @@ export default new Vuex.Store({
       schedule_id: 1,
       event_sport: '篮球',
       venue_name: '篮球场1号',
+      referee_name: '张三、李四、王五',
       start_time: '2025-01-01 12:00',
       end_time: '2025-01-01 13:00',
       responsible_person: '张三',
@@ -35,6 +36,7 @@ export default new Vuex.Store({
       schedule_id: null,
       event_sport: '足球',
       venue_name: '足球场1号',
+      referee_name: '张三、李四、王五',
       start_time: '2025-01-01 12:00',
       end_time: '2025-01-01 13:00',
       responsible_person: '李四',
@@ -61,6 +63,7 @@ export default new Vuex.Store({
       schedule_id: 1,
       event_sport: '篮球',
       venue_name: '篮球场1号',
+      referee_name: '张三、李四、王五',
       start_time: '2026-01-01 12:00',
       end_time: '2026-01-01 13:00',
       responsible_person: '张三',
@@ -88,6 +91,7 @@ export default new Vuex.Store({
       schedule_id: 1,
       event_sport: '篮球',
       venue_name: '篮球场1号',
+      referee_name: '张三、李四、王五',
       start_time: '2026-01-01 12:00',
       end_time: '2026-01-01 13:00',
       responsible_person: '张三',
@@ -136,27 +140,50 @@ export default new Vuex.Store({
     // auditTable表格数据
     auditEventTableData: [{
       event_id: 123456,
+      schedule_id: 1,
       event_sport: '篮球',
-      participants: '软件1223、软件1224',
       venue_name: '篮球场1号',
-      start_time: '2025-04-04 12:00',
-      end_time: '2025-04-04 13:00',
+      referee_name: '张三、李四、王五',
+      start_time: '2026-01-01 12:00',
+      end_time: '2026-01-01 13:00',
       responsible_person: '张三',
+      phone: 12345678,
       note: '备注备注备注备注备注备注备注备注备注备注',
-      opinion: '我看不顺眼',
-      review_status: 2,
-    }, {
-      event_id: 123456,
-      event_sport: '篮球',
-      participants: '软件1223、软件1224',
-      venue_name: '篮球场1号',
-      start_time: '2025-05-01 12:00',
-      end_time: '2025-05-01 13:00',
-      responsible_person: '张三',
-      note: '备注备注备注备注备注备注备注备注备注备注',
+      review_status: 0,
       opinion: '',
-      review_status: 0}
-    ],
+      participants: [
+        {
+          teamName: '软件1223',
+          team_score: 90,
+          players: [{name: '张三', person_score: '40'}, {name: '李四', person_score: '30'}, {name: '王五', person_score: '20'}]
+        },
+        {
+          teamName: '软件1224',
+          team_score: 80,
+          players: [{name: '赵大', person_score: '20'}, {name: '刘二', person_score: '30'}, {name: '齐六', person_score: '40'}]
+        }
+      ]
+    },{
+      event_id: 123456,
+      schedule_id: 1,
+      event_sport: '篮球',
+      venue_name: '篮球场1号',
+      referee_name: '张三、李四、王五',
+      start_time: '2026-01-01 12:00',
+      end_time: '2026-01-01 13:00',
+      responsible_person: '张三',
+      phone: 12345678,
+      note: '备注备注备注备注备注备注备注备注备注备注',
+      review_status: 2,
+      opinion: '这是否决原因',
+      participants: [
+        {
+          teamName: '软件1223',
+          team_score: 90,
+          players: [{name: '张三', person_score: '40'}, {name: '李四', person_score: '30'}, {name: '王五', person_score: '20'}]
+        }
+      ]
+    }],
 
     // refereeUL列表数据
     refereeULData: [{
@@ -185,6 +212,7 @@ export default new Vuex.Store({
       likes: 428
     }],
 
+    // myVenueTable我的赛事数据
     myVenueTableData: [
       {
         venue_id: 123456,
@@ -198,12 +226,110 @@ export default new Vuex.Store({
         end_time: '2019-01-02 11:00:00'
       }],
 
+    // 统计状态数据
     statData: {
       totalEventCount: 4154,
       monthEventCount: 1314,
       todayEventCount: 1000,
       todayWaitEventCount: 500
-    }
+    },
+
+    // myEventList数据:添加赛事到赛程的可用我的赛事
+    myEventListData: [
+      {
+        event_id: 123456,
+        scheduled_id: 123,
+        event_sport: '篮球',
+        start_time: '2026-01-01 12:00',
+        end_time: '2026-01-01 13:00',
+        participants: [
+          {
+            teamName: '软件1223',
+            players: [
+              {name: '张三'},
+              {name: '李四'},
+              {name: '王五'}
+            ]
+          },
+          {
+            teamName: '软件1224',
+            players: [
+              {name: '赵大'},
+              {name: '刘二'},
+              {name: '齐六'}
+            ]
+          }
+        ]
+      },
+      {
+        event_id: 123457,
+        scheduled_id: 123,
+        event_sport: '足球',
+        start_time: '2026-01-02 15:00',
+        end_time: '2026-01-02 16:30',
+        participants: [
+          {
+            teamName: '网络1221',
+            players: [
+              {name: '孙七'},
+              {name: '周八'}
+            ]
+          },
+          {
+            teamName: '网络1222',
+            players: [
+              {name: '吴九'},
+              {name: '郑十'}
+            ]
+          }
+        ]
+      },
+      {
+        event_id: 123456,
+        scheduled_id: 123,
+        event_sport: '篮球',
+        start_time: '2026-01-01 12:00',
+        end_time: '2026-01-01 13:00',
+        participants: [
+          {
+            teamName: '软件1223',
+            players: [
+              {name: '张三'},
+              {name: '李四'},
+              {name: '王五'}
+            ]
+          },
+          {
+            teamName: '软件1224',
+            players: [
+              {name: '赵大'},
+              {name: '刘二'},
+              {name: '齐六'}
+            ]
+          }
+        ]
+      }
+    ],
+
+    // 我的赛程队伍数据
+    myScheduleTreeData: {
+      schedule_id: 123456789,
+      winner: '软件1223',
+      schedule: [[{event_id: 123456, team1: '软件1223', team2: '软件1224', winner: '软件1223', team1_score: 16, team2_score: 8},
+       {event_id: 123456, team1: '土木1223', team2: '土木1224', winner: '土木1224', team1_score: 4, team2_score: 9},
+       {event_id: 123456, team1: '能源1223', team2: '能源1224', winner: '能源1223', time: "2023-07-15 15:00"},
+       {event_id: 123456, team1: '计网1223'}],
+
+      [{event_id: 123456, team1: '软件1223', team2: '软件1224', winner: '软件1223', team1_score: 16, team2_score: 8},
+       {event_id: 123456, team1: '土木1223', team2: '土木1224', winner: '土木1224', team1_score: 4, team2_score: 9},
+       {event_id: 123456, team1: '能源1223', team2: '能源1224', winner: '能源1223', time: "2023-07-15 15:00"},
+       {event_id: 123456, team1: '计网1223'}],
+
+      [{event_id: 123456, team1: '软件1223', team2: '软件1224', winner: '软件1224'},
+       {event_id: 123456, team1: '土木1223', team2: '土木1224', winner: '土木1223'}],
+
+      [{event_id: 123456, team1: '软件1223', team2: '软件1224', winner: '软件1223'}]
+    ]}
   },
   getters: {
   },
@@ -231,7 +357,17 @@ export default new Vuex.Store({
     },
     updateMyVenueTableData(state, n) {
       state.myVenueTableData = n;
-    }
+    },
+    updateMyEventListDataByReset(state, n) {
+      state.myEventListData = n;
+    },
+    updateMyEventListDataByAdd(state, n) {
+      state.myEventListData.push(...n);
+    },
+    updateMyScheduleTreeData(state, n) {
+      state.myScheduleTreeData = n;
+    },
+
   },
   actions: {
   },

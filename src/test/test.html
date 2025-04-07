@@ -3,189 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>表单原型图</title>
+    <title>8进4进2进1淘汰赛赛程</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 20px;
+        * {
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #fff;
+        body {
+            margin: 0;
             padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .tournament-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
             text-align: center;
-            color: #333;
-            margin-bottom: 20px;
+            color: #2c3e50;
+            margin-bottom: 30px;
         }
 
-        .form-group {
-            margin-bottom: 20px;
+        .bracket {
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+            padding: 20px 0;
         }
 
-        .form-group label {
-            display: block;
+        .round {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            min-width: 180px;
+            margin: 0 20px;
+        }
+
+        .round-title {
+            text-align: center;
             font-weight: bold;
-            margin-bottom: 8px;
-            color: #555;
+            margin-bottom: 20px;
+            padding: 5px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 4px;
         }
 
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
+        .match {
+            position: relative;
+            margin: 15px 0;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .form-group .hint {
-            font-size: 12px;
-            color: #888;
-            margin-top: 5px;
-        }
-
-        .form-group .time-range {
-            display: flex;
-            gap: 10px;
-        }
-
-        .form-group .time-range input {
-            flex: 1;
-        }
-
-        .additional-info {
             background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
+            min-height: 80px;
         }
 
-        .additional-info h2 {
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 10px;
+        /* 连接线样式 */
+        .match::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            right: -20px;
+            width: 20px;
+            height: 1px;
+            background-color: #999;
         }
 
-        .additional-info p {
-            font-size: 14px;
-            color: #666;
-            margin: 0;
+        .round:last-child .match::after {
+            display: none;
         }
 
-        .submit-button {
+        .connector {
+            position: absolute;
+            right: -20px;
+            width: 20px;
+            height: 50%;
+            border-right: 1px solid #999;
+        }
+
+        .connector.top {
+            top: 0;
+            border-bottom: 1px solid #999;
+        }
+
+        .connector.bottom {
+            bottom: 0;
+            border-top: 1px solid #999;
+        }
+
+        /* 队伍样式 */
+        .team {
+            padding: 8px;
+            margin: 5px 0;
+            background-color: white;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            position: relative;
+        }
+
+        .team.winner {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .team.winner::before {
+            content: "✓";
+            color: #28a745;
+            position: absolute;
+            left: 5px;
+        }
+
+        /* 决赛特殊样式 */
+        .final-match {
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+        }
+
+        .champion {
+            background-color: #ffd700;
+            border-color: #ffc107;
             text-align: center;
+            font-weight: bold;
         }
 
-        .submit-button button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-        }
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .bracket {
+                flex-direction: column;
+                align-items: center;
+            }
 
-        .submit-button button:hover {
-            background-color: #0056b3;
+            .round {
+                width: 100%;
+                margin: 10px 0;
+            }
+
+            .match::after, .connector {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>活动报名表单</h1>
+<div class="tournament-container">
+    <h1>8进4进2进1淘汰赛赛程</h1>
 
-    <!-- 辅助信息 -->
-    <div class="additional-info">
-        <h2>填写说明</h2>
-        <p>请仔细填写以下表单，确保信息准确无误。带 * 的字段为必填项。</p>
+    <div class="bracket">
+        <!-- 四分之一决赛 (8进4) -->
+        <div class="round">
+            <div class="round-title">四分之一决赛</div>
+
+            <div class="match">
+                <div class="team winner">队伍A</div>
+                <div class="team">队伍B</div>
+                <div class="connector top"></div>
+            </div>
+
+            <div class="match">
+                <div class="team">队伍C</div>
+                <div class="team winner">队伍D</div>
+                <div class="connector bottom"></div>
+            </div>
+
+            <div class="match">
+                <div class="team winner">队伍E</div>
+                <div class="team">队伍F</div>
+                <div class="connector top"></div>
+            </div>
+
+            <div class="match">
+                <div class="team winner">队伍G</div>
+                <div class="team">队伍H</div>
+                <div class="connector bottom"></div>
+            </div>
+        </div>
+
+        <!-- 半决赛 (4进2) -->
+        <div class="round">
+            <div class="round-title">半决赛</div>
+
+            <div class="match">
+                <div class="team winner">队伍A</div>
+                <div class="team">队伍D</div>
+                <div class="connector top"></div>
+            </div>
+
+            <div class="match">
+                <div class="team">队伍E</div>
+                <div class="team winner">队伍G</div>
+                <div class="connector bottom"></div>
+            </div>
+        </div>
+
+        <!-- 决赛 (2进1) -->
+        <div class="round">
+            <div class="round-title">决赛</div>
+
+            <div class="match final-match">
+                <div class="team">队伍A</div>
+                <div class="team winner">队伍G</div>
+            </div>
+        </div>
+
+        <!-- 冠军 -->
+        <div class="round">
+            <div class="round-title">冠军</div>
+
+            <div class="match champion">
+                <div class="team winner">队伍G</div>
+            </div>
+        </div>
     </div>
 
-    <!-- 表单 -->
-    <form>
-        <!-- 运动项目 -->
-        <div class="form-group">
-            <label for="event_sport">运动项目 *</label>
-            <select id="event_sport" name="event_sport">
-                <option value="">请选择运动项目</option>
-                <option value="篮球">篮球</option>
-                <option value="足球">足球</option>
-                <option value="羽毛球">羽毛球</option>
-            </select>
-        </div>
-
-        <!-- 场地信息 -->
-        <div class="form-group">
-            <label for="venue_name">场地名称 *</label>
-            <input type="text" id="venue_name" name="venue_name" placeholder="请输入场地名称">
-            <p class="hint">请填写活动举办的场地名称。</p>
-        </div>
-
-        <!-- 时间范围 -->
-        <div class="form-group">
-            <label for="timeRange">时间范围 *</label>
-            <div class="time-range">
-                <input type="datetime-local" id="start_time" name="start_time">
-                <input type="datetime-local" id="end_time" name="end_time">
-            </div>
-            <p class="hint">请选择活动的开始时间和结束时间。</p>
-        </div>
-
-        <!-- 负责人信息 -->
-        <div class="form-group">
-            <label for="responsible_person">负责人 *</label>
-            <input type="text" id="responsible_person" name="responsible_person" placeholder="请输入负责人姓名">
-        </div>
-
-        <!-- 联系电话 -->
-        <div class="form-group">
-            <label for="phone">联系电话 *</label>
-            <input type="tel" id="phone" name="phone" placeholder="请输入联系电话">
-        </div>
-
-        <!-- 参与人数 -->
-        <div class="form-group">
-            <label for="participants">参与人数 *</label>
-            <input type="number" id="participants" name="participants" placeholder="请输入参与人数">
-        </div>
-
-        <!-- 裁判姓名 -->
-        <div class="form-group">
-            <label for="referee_name">裁判姓名</label>
-            <select id="referee_name" name="referee_name" multiple>
-                <option value="张三">张三</option>
-                <option value="李四">李四</option>
-                <option value="王五">王五</option>
-            </select>
-            <p class="hint">可多选裁判姓名。</p>
-        </div>
-
-        <!-- 备注 -->
-        <div class="form-group">
-            <label for="note">备注</label>
-            <textarea id="note" name="note" placeholder="请输入备注信息"></textarea>
-        </div>
-
-        <!-- 提交按钮 -->
-        <div class="submit-button">
-            <button type="submit">提交</button>
-        </div>
-    </form>
+    <!-- 赛程说明 -->
+    <div style="margin-top: 30px; padding: 15px; background-color: #f8f9fa; border-radius: 4px;">
+        <h3 style="margin-top: 0;">赛程说明</h3>
+        <ol>
+            <li><strong>四分之一决赛</strong>：8支队伍进行4场比赛，胜者进入半决赛</li>
+            <li><strong>半决赛</strong>：4支队伍进行2场比赛，胜者进入决赛</li>
+            <li><strong>决赛</strong>：2支队伍进行1场比赛，决出冠军</li>
+            <li>绿色背景表示获胜队伍，✓标记表示胜者</li>
+            <li>金色区域表示冠军队伍</li>
+        </ol>
+    </div>
 </div>
 </body>
 </html>
