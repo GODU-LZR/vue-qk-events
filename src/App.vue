@@ -9,14 +9,13 @@
         mode="horizontal"
         @select="handleSelect"
         router>
-      <el-menu-item index="/GetEvent">查询赛事</el-menu-item>
+      <el-menu-item index="/sport">查询赛事</el-menu-item>
       <el-menu-item index="/GetReferee">裁判简介</el-menu-item>
       <el-submenu index="2">
         <template slot="title">我的工作台</template>
-        <el-menu-item index="/AddEvent">预约赛事</el-menu-item>
-        <el-menu-item index="/HandleSchedule">创建/更新赛程</el-menu-item>
-        <el-menu-item index="/MyEvent">我的赛事</el-menu-item>
-        <el-menu-item index="/FollowEvent">我的关注</el-menu-item>
+        <el-menu-item index="/AddMatch">预约赛事</el-menu-item>
+        <el-menu-item index="/GetMyMatch">我的赛事</el-menu-item>
+        <el-menu-item index="/FollowEvent">我的关注比赛</el-menu-item>
       </el-submenu>
 
       <el-menu-item index="/AuditEvent" v-if="user === '赛事管理员' || user === '超级管理员'">审核平台</el-menu-item>
