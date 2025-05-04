@@ -5,7 +5,7 @@
         <div class="date-title">{{ formatDate(group.date) }}</div>
       </div>
       <el-table :data="group.events" style="width: 100%">
-        <el-table-column label="比赛项目" prop="event_sport"></el-table-column>
+        <el-table-column label="比赛项目" prop="sport"></el-table-column>
         <el-table-column label="比赛队伍">
           <template slot-scope="scope">
             {{ scope.row.awayTeam }} VS {{ scope.row.homeTeam }}
@@ -21,7 +21,7 @@
           <template slot-scope="scope">
             <el-button
                 size="mini"
-                @click="checkEvent(scope.row.event_id)">
+                @click="toMatch(scope.row.matchId)">
               查看详情
             </el-button>
           </template>
@@ -33,9 +33,9 @@
 
 <script>
 export default {
-  name: "matchScheduleTable",
+  name: "gameTable",
   props: {
-    eventsData: {
+    matches: {
       type: Array,
       required: true
     }
@@ -47,9 +47,9 @@ export default {
   },
   methods: {
     /* 前端路由函数 */
-    // 选中比赛,请求路由至GetMyMatchEvent页面
-    checkEvent(eventId) {
-      this.$emit("select-event", eventId);
+    // 选中比赛,请求路由至match页面
+    toMatch(matchId) {
+      this.$emit("to-match", matchId);
     },
 
     /* 前端函数 */
@@ -66,7 +66,7 @@ export default {
       const groups = {};
 
       // 按日期分组
-      this.eventsData.forEach(event => {
+      this.matches.forEach(event => {
         const date = event.start_time.split(" ")[0];
         if (!groups[date]) {
           groups[date] = [];

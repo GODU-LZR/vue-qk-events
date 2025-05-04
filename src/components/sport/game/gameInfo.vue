@@ -59,6 +59,11 @@
             size="small"
             style="width: 100%"/>
       </el-descriptions-item>
+
+      <el-descriptions-item label="备注信息">
+        <el-input
+            v-model="gameData.note" disabled size="small" type="textarea" :rows="3" resize="none"/>
+      </el-descriptions-item>
     </el-descriptions>
   </div>
 </template>

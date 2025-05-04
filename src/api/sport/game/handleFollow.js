@@ -1,10 +1,13 @@
-import eventRequest from '../../../utils/eventRequest.js'
+import request from '@/api/config/index';
 
-// 获取赛事的对应比赛列表
+// 用户关注或取消关注赛事
 export const handleFollow = (matchId) => {
     const url = '';
     const data = {
         matchId: matchId
     }
-    return eventRequest.post(url, data);
+    return request({
+        url: url,
+        method: 'get'
+    });
 }

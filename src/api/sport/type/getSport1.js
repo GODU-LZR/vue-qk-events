@@ -1,7 +1,10 @@
-import eventRequest from '../../../utils/eventRequest.js'
+import request from '@/api/config/index';
 
-// 获取带赛程列表的赛事项目数据
+// 获取带赛事列表的赛事项目数据
 export const getSport1 = () => {
     const url = '';
-    return eventRequest.post(url);
+    return request({
+        url: url,
+        method: 'get'
+    });
 }

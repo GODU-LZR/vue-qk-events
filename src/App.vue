@@ -5,7 +5,6 @@
     <div class="line"></div>
     <el-menu
         default-active="/GetEvent"
-        class="el-menu-demo"
         mode="horizontal"
         @select="handleSelect"
         router>
@@ -14,7 +13,7 @@
       <el-submenu index="2">
         <template slot="title">我的工作台</template>
         <el-menu-item index="/AddMatch">预约赛事</el-menu-item>
-        <el-menu-item index="/GetMyMatch">我的赛事</el-menu-item>
+        <el-menu-item index="/my">我的赛事</el-menu-item>
         <el-menu-item index="/FollowEvent">我的关注比赛</el-menu-item>
       </el-submenu>
 

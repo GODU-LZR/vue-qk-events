@@ -1,11 +1,8 @@
 import request from '@/api/config/index';
 
-// 获取赛事的对应比赛列表
-export const getMatches = (gameId) => {
+// 获取裁判待选选项
+export const getRefereeOptions = (referee) => {
     const url = '';
-    const data = {
-        gameId: gameId
-    }
     return request({
         url: url,
         method: 'get'

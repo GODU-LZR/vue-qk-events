@@ -57,11 +57,13 @@ export default {
         register_end_time: '2026-03-01 00:00',
         start_time: '2026-04-01 00:00',
         end_time: '',
+        note: '备注信息',
+        // mode: 1
       },
 
       matches: [
         {
-          matchId: 123456,
+          matchId: 'M20231128001',
           sport: "篮球",
           awayTeam: '软件1223',
           homeTeam: '软件1224',
@@ -75,7 +77,7 @@ export default {
           winner: "软件1224"
         },
         {
-          matchId: 123457,
+          matchId: 'M20231128002',
           sport: "羽毛球",
           awayTeam: '软件1223',
           homeTeam: '软件1224',

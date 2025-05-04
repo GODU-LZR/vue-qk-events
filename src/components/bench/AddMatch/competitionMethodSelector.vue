@@ -86,7 +86,8 @@ export default {
 
 .option-box.selected {
   background-color: #e3f2fd;
-  border: 2px solid #2196f3;
+  outline: 2px solid #2196f3;
+  box-sizing: border-box;
 }
 
 .option-title {

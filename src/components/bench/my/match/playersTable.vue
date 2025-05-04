@@ -45,12 +45,8 @@
 </template>
 
 <script>
-import updatePlayerForm from './updatePlayerForm'
 export default {
-  name: "myMatchPlayersTable",
-  components: {
-    updatePlayerForm: updatePlayerForm
-  },
+  name: "layersTable",
   props: {
     teamName: {
       type: String

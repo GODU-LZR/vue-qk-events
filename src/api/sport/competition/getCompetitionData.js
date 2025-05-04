@@ -1,6 +1,6 @@
-import eventRequest from '../../../utils/eventRequest.js'
+import request from '@/api/config/index';
 
-// 获取赛程列表
+// 获取赛事列表数据
 export const getCompetitionData = (sportId, page, filter) => {
     const url = '';
     const data = {
@@ -11,5 +11,8 @@ export const getCompetitionData = (sportId, page, filter) => {
         registerTime: filter.registerTime,
         time: filter.time
     }
-    return eventRequest.post(url, data);
+    return request({
+        url: url,
+        method: 'get'
+    });
 }

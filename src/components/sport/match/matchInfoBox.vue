@@ -47,7 +47,7 @@ export default {
 
 <style scoped>
 .event-info-box {
-  width: 100%;
+  padding: 0 20px;
   margin-bottom: 20px;
   border-bottom: 1px dashed #dcdfe6;
 }

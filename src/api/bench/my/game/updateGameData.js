@@ -1,11 +1,8 @@
 import request from '@/api/config/index';
 
-// 获取赛事的对应比赛列表
-export const getMatches = (gameId) => {
+// 修改赛事的基本信息数据
+export const updateGameData = (form) => {
     const url = '';
-    const data = {
-        gameId: gameId
-    }
     return request({
         url: url,
         method: 'get'

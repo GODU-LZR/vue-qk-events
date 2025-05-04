@@ -88,7 +88,7 @@ export default {
 
     /* 后端函数 */
     // 获取赛事数据的统计结果(总页数)
-    async getMatchNumber() {
+    async getCompetitionNumber() {
       this.pageLoading = true;
       try{
         const data = await getCompetitionPage(this.sportId);
@@ -136,7 +136,7 @@ export default {
     if (!this.sportId) {
       return;
     }
-    await this.getMatchNumber();
+    await this.getCompetitionNumber();
     await this.getMatch();
   }
 }

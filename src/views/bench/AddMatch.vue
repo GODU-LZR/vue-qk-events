@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import addEventForm from "../../components/MyWorkbench/AddMatch/addMatchForm"
+import addEventForm from "../../components/bench/AddMatch/addMatchForm"
 export default {
   name: "AddEvent",
   components: {

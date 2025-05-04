@@ -1,44 +1,10 @@
 <template>
   <div class="event-info-container">
     <!-- 比赛信息表单 -->
-    <el-form ref="eventForm" :model="form" label-width="100px" style="margin-top: 20px">
+    <el-form ref="eventForm" :model="form" label-width="100px" style="margin-top: 20px" label-position="left">
       <!-- 体育项目 (disabled) -->
       <el-form-item label="比赛项目">
-        <el-input v-model="form.event_sport" disabled></el-input>
-      </el-form-item>
-
-      <!-- 客队名称 客队得分 VS 主队得分 主队名称 -->
-      <el-form-item label="队伍信息">
-        <el-row type="flex" align="middle" :gutter="10">
-          <!-- 客队部分 -->
-          <el-col :span="7">
-            <el-input v-model="form.awayTeam" disabled style="width: 100%;"></el-input>
-          </el-col>
-          <el-col :span="4">
-            <el-input-number
-                v-model="form.awayTeam_score"
-                controls-position="right"
-                :min="0"
-                style="width: 100%;"></el-input-number>
-          </el-col>
-
-          <!-- VS 部分 -->
-          <el-col :span="2" style="text-align: center;">
-            <span style="font-weight: bold;">VS</span>
-          </el-col>
-
-          <!-- 主队部分 -->
-          <el-col :span="4">
-            <el-input-number
-                v-model="form.homeTeam_score"
-                controls-position="right"
-                :min="0"
-                style="width: 100%;"></el-input-number>
-          </el-col>
-          <el-col :span="7">
-            <el-input v-model="form.homeTeam" disabled style="width: 100%;"></el-input>
-          </el-col>
-        </el-row>
+        <el-input v-model="form.sport" disabled></el-input>
       </el-form-item>
 
       <!-- 场馆名称 -->
@@ -67,6 +33,25 @@
               :value="item">
           </el-option>
         </el-select>
+      </el-form-item>
+
+      <!-- 裁判选择 -->
+      <el-form-item label="负责人员">
+        <el-select
+            v-model="form.responsible_person"
+            placeholder="请选择负责人"
+            style="width: 100%;">
+          <el-option
+              v-for="item in responsiblePersonOptions"
+              :key="item"
+              :label="item"
+              :value="item">
+          </el-option>
+        </el-select>
+      </el-form-item>
+
+      <el-form-item label="联系电话">
+        <el-input v-model="form.phone"></el-input>
       </el-form-item>
 
       <!-- 开始时间 -->
@@ -106,13 +91,17 @@
           <el-option label="待定" value="待定"></el-option>
         </el-select>
       </el-form-item>
+
+      <el-form-item label="备注信息">
+        <el-input v-model="form.note" type="textarea" :rows="3" resize="none"></el-input>
+      </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'eventInfo',
+  name: 'matchInfo',
   props: {
     value: {
       type: Object,
@@ -123,6 +112,7 @@ export default {
     return {
       venueOptions: [],
       refereeOptions: [],
+      responsiblePersonOptions: [],
 
       form: JSON.parse(JSON.stringify(this.value))
     };

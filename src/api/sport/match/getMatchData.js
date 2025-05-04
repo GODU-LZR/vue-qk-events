@@ -1,10 +1,13 @@
-import eventRequest from '../../../utils/eventRequest.js'
+import request from '@/api/config/index';
 
-// 获取带赛程列表的赛事项目数据
+// 获取比赛的基本信息数据
 export const getMatchData = (matchId) => {
     const url = '';
     const data = {
         matchId: matchId
     }
-    return eventRequest.post(url, data);
+    return request({
+        url: url,
+        method: 'get'
+    });
 }

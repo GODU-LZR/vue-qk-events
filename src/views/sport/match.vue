@@ -35,6 +35,9 @@
 <script>
 import {getMatchData} from "@/api/sport/match/getMatchData";
 import {getSummaryData} from "@/api/sport/match/getSummaryData";
+import {getHighlightsData} from "@/api/sport/match/getHighlightsData";
+import {getQuartersData} from "@/api/sport/match/getQuartersData";
+import {getTeamStatsData} from "@/api/sport/match/getTeamStatsData";
 
 import matchInfoBox from '../../components/sport/match/matchInfoBox'
 import matchScoreBox from '../../components/sport/match/matchScoreBox'
@@ -58,7 +61,6 @@ export default {
 
       matchData: {
         matchId: 2024001,
-        scheduleId: 1,
         sport: '篮球',
         venue_name: '篮球馆1号',
         referee_name: ['王裁判', '张裁判', '李裁判'],
@@ -67,7 +69,6 @@ export default {
         responsible_person: '张管理员',
         phone: '13800138000',
         note: '请各队提前30分钟到场热身，迟到15分钟视为弃权',
-        review_status: 1,
         is_followed: 1,
       },
 
@@ -197,27 +198,78 @@ export default {
     // 后端函数
     async getMatchData() {
       try {
-        const data = await getMatchData(this.matchId);
-        this.matchData = data;
+        const response = await getMatchData(this.matchId);
+        this.matchData = response.data;
       }catch (error) {
         this.$message.error('获取比赛信息失败，请重试!');
         console.error('获取比赛信息失败:', error);
       }
     },
 
+    // 获取队伍信息数据
     async getSummaryData() {
       try {
-        const data = await getSummaryData(this.matchId);
-        console.log(data);
-        // this.summaryData = data;
+        const response = await getSummaryData(this.matchId);
+        this.summaryData = response.data;
       }catch (error) {
         this.$message.error('获取队伍信息失败，请重试!');
         console.error('获取队伍信息失败:', error);
       }
-    }
+    },
+
+    // 获取比赛高光数据
+    async getHighlightsData() {
+      try {
+        const response = await getHighlightsData(this.matchId);
+        this.highlightsData = response.data;
+      }catch (error) {
+        this.$message.error('获取比赛高光信息失败，请重试!');
+        console.error('获取比赛高光信息失败:', error);
+      }
+    },
+
+    // 获取客队信息数据
+    async getAwayPlayersData() {
+      try {
+      }catch (error) {
+        this.$message.error('获取客队信息失败，请重试!');
+        console.error('获取客队信息失败:', error);
+      }
+    },
+
+    // 获取主队信息数据
+    async getHomePlayersData() {
+      try {
+      }catch (error) {
+        this.$message.error('获取主队信息失败，请重试!');
+        console.error('获取主队信息失败:', error);
+      }
+    },
+
+    // 获取比赛场次得分数据
+    async getQuartersData() {
+      try {
+        const response = await getQuartersData(this.matchId);
+        this.quartersData = response.data;
+      }catch (error) {
+        this.$message.error('获取比赛场次得分信息失败，请重试!');
+        console.error('获取比赛场次得分信息失败:', error);
+      }
+    },
+
+    // 获取比赛得分组成数据
+    async getTeamStatsData() {
+      try {
+        const response = await getTeamStatsData(this.matchId);
+        this.teamStatsData = response.data;
+      }catch (error) {
+        this.$message.error('获取比赛得分组成信息失败，请重试!');
+        console.error('获取比赛得分组成信息失败:', error);
+      }
+    },
   },
   async created() {
-    // 将url中的sportId初始化到sportId变量中,如果不存在，则直接返回到GetSport页面
+    // 将url中的matchId初始化到matchId变量中,如果不存在，则直接返回到GetSport页面
     const id = this.$route.params.matchId;
     if(id === undefined || id === '') {
       // this.toPrev();
@@ -226,7 +278,12 @@ export default {
     }
   },
   async mounted() {
-    await this.getSummaryData()
+    await this.getSummaryData();
+    await this.getHighlightsData();
+    await this.getAwayPlayersData();
+    await this.getHomePlayersData();
+    await this.getQuartersData();
+    await this.getTeamStatsData();
   }
 }
 </script>

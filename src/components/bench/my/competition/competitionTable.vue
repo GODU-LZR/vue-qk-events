@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <el-table
-        :data="myMatchTableData"
-        style="width: 100%">
+        :data="competitionData"
+        style="width: 100%; min-height: 500px">
       <el-table-column
           label="赛程名称"
           prop="name">
@@ -41,7 +41,7 @@
         <template slot-scope="scope">
           <el-button
               size="mini"
-              @click="checkMatch(scope.row.matchId)">查看详情</el-button>
+              @click="toGame(scope.row.gameId)">查看详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -50,9 +50,9 @@
 
 <script>
 export default {
-  name: "myMatchTable",
+  name: "competitionTable",
   props: {
-    myMatchTableData: {
+    competitionData: {
       type: Array,
       required: true
     }
@@ -63,9 +63,9 @@ export default {
   },
   methods: {
     /* 前端路由方法 */
-    // 选中赛事,请求路由至GetMyMatchSchedule页面
-    checkMatch(matchId) {
-      this.$emit("select-match", matchId);
+    // 选中赛事,请求路由至game页面
+    toGame(gameId) {
+      this.$emit("to-game", gameId);
     },
 
     /* 前端方法 */
@@ -98,8 +98,8 @@ export default {
 
 <style scoped>
 .container {
-  display: flex;
-  flex-direction: column;
-  height: 75vh; /* 容器占满整个视口高度 */
+  padding: 0 10px;
+  margin: 0;
+  box-sizing: border-box;
 }
 </style>

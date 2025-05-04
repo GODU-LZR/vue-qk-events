@@ -1,11 +1,8 @@
 import request from '@/api/config/index';
 
-// 获取赛事的对应比赛列表
-export const getMatches = (gameId) => {
+// 获取我的赛事列表的总条数
+export const getCompetitionPage = (review_status) => {
     const url = '';
-    const data = {
-        gameId: gameId
-    }
     return request({
         url: url,
         method: 'get'

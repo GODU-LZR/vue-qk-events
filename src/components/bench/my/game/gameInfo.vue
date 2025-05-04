@@ -25,12 +25,13 @@
             size="small"
             style="width: 100%"
             remote
-            filterable>
+            filterable
+            :remote-method="getResponsiblePersonOptions">
           <el-option
-              v-for="item in responsiblePersonData"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"/>
+              v-for="item in responsiblePersonOptions"
+              :key="item.userId"
+              :label="item.name"
+              :value="item.userId"/>
         </el-select>
       </el-descriptions-item>
 
@@ -45,7 +46,7 @@
       </el-descriptions-item>
 
       <!-- 报名时间 -->
-      <el-descriptions-item label="报名时间" :span="2">
+      <el-descriptions-item label="报名时间">
         <el-date-picker
             v-model="registerTimeRange"
             @change="handleTimeRangeChange"
@@ -56,7 +57,22 @@
             value-format="yyyy-MM-dd HH:mm"
             format="yyyy-MM-dd HH:mm"
             size="small"
-            style="width: 40%"/>
+            style="width: 100%"/>
+      </el-descriptions-item>
+
+      <el-descriptions-item label="匹配模式">
+        <el-select
+            v-model="localSchedule.mode"
+            @change="handleInputChange"
+            placeholder="请选择匹配模式"
+            size="small"
+            style="width: 100%">
+          <el-option
+              v-for="item in [{value: 0, label: '系统按时间分配'}, {value: 1, label: '系统按随机分配'}, {value: 2, label: '用户自定义'},]"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"/>
+        </el-select>
       </el-descriptions-item>
 
       <!-- 赛事时间 -->
@@ -74,12 +90,19 @@
             size="small"
             style="width: 100%"/>
       </el-descriptions-item>
+
+      <el-descriptions-item label="备注信息">
+        <el-input
+            v-model="localSchedule.note" size="small" type="textarea" :rows="3" resize="none"/>
+      </el-descriptions-item>
     </el-descriptions>
   </div>
 </template>
 
 <script>
+import {getResponsiblePersonOptions} from "@/api/bench/my/game/gameInfo/getResponsiblePersonOptions";
 export default {
+  name: "gameInfo",
   props: {
     value: {
       type: Object,
@@ -90,7 +113,7 @@ export default {
     return {
       localSchedule: {},
       registerTimeRange: [],
-      responsiblePersonData: []
+      responsiblePersonOptions: [{userId: 1, name: '张三'}, {userId: 2, name: '李四'}]
     }
   },
   watch: {
@@ -112,6 +135,8 @@ export default {
     }
   },
   methods: {
+    /* 前端函数 */
+    // 向父组件请求修改数据
     handleInputChange() {
       this.$emit('input', this.localSchedule)
     },
@@ -120,6 +145,21 @@ export default {
       this.localSchedule.register_start_time = range?.[0] || ''
       this.localSchedule.register_end_time = range?.[1] || ''
       this.handleInputChange()
+    },
+
+    /* 后端函数 */
+    async getResponsiblePersonOptions(responsiblePerson) {
+      if (responsiblePerson === '') {
+        this.responsiblePersonOptions = [];
+        return;
+      }
+      try {
+        const response = await getResponsiblePersonOptions(responsiblePerson);
+        this.responsiblePersonOptions = response.data;
+      }catch (error) {
+        this.$message.error('获取负责人待选选项失败，请重试!');
+        console.error('获取负责人待选选项失败:', error);
+      }
     }
   }
 }
